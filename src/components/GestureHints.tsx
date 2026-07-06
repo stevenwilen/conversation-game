@@ -23,7 +23,7 @@ export function GestureHints({ canLighter, canDeeper }: GestureHintsProps) {
           ‹ lighter
         </span>
         <span className="text-white/35">·</span>
-        <span className="opacity-90">tap to answer</span>
+        <span className="opacity-90">tap when done</span>
         <span className="text-white/35">·</span>
         <span
           className="transition-opacity duration-300"

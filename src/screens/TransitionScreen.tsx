@@ -3,11 +3,13 @@ import { motion } from 'framer-motion'
 import type { TurnAction } from '../game/types'
 import { useHaptics } from '../hooks/useHaptics'
 
-// The hand-off. Appears after EVERY action to (a) name the action just taken and
-// move the spotlight clearly to the next player, and (b) pace the game — the
-// next card can't be revealed until a short dwell passes and the phone is
-// deliberately tapped. This is what stops rapid chain-swiping through cards.
-// "Go back" undoes an accidental action and returns to the same card.
+// The hand-off. Appears after EVERY action to (a) show where the conversation is
+// heading and move the spotlight clearly to the next player, and (b) pace the
+// game — the next card can't be revealed until a short dwell passes and the
+// phone is deliberately tapped. "Go back" undoes an accidental action.
+//
+// Every hand-off shares one purple background; a single drifting icon carries
+// the direction instead of colour.
 
 interface TransitionScreenProps {
   nextPlayerName: string
@@ -17,6 +19,7 @@ interface TransitionScreenProps {
 }
 
 const DWELL_MS = 900
+const BACKGROUND = 'linear-gradient(160deg, #1E1630 0%, #2E2142 100%)'
 
 function actionLabel(action: TurnAction | null): string {
   switch (action) {
@@ -31,18 +34,48 @@ function actionLabel(action: TurnAction | null): string {
   }
 }
 
-// Background reflects the action just taken so the direction is unmistakable:
-// warm when easing up (lighter), cool indigo when going deeper, neutral plum
-// for a plain answer.
-function transitionBg(action: TurnAction | null): string {
-  switch (action) {
-    case 'deeper':
-      return 'linear-gradient(160deg, #3B2E7E 0%, #191140 100%)'
-    case 'lighter':
-      return 'linear-gradient(160deg, #C25A34 0%, #6E2A4C 100%)'
-    default:
-      return 'linear-gradient(160deg, #1E1630 0%, #2E2142 100%)'
+// Chevrons descending for deeper, rising for lighter, a check for a plain answer
+// (staying at the same depth). The chevrons drift in their direction so you can
+// feel where the game is heading.
+function ActionIcon({ action }: { action: TurnAction | null }) {
+  const svg = {
+    width: 34,
+    height: 34,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 2.4,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
   }
+  const drift = { duration: 1.7, repeat: Infinity, ease: 'easeInOut' as const }
+
+  if (action === 'deeper') {
+    return (
+      <motion.svg {...svg} animate={{ y: [0, 4, 0] }} transition={drift}>
+        <path d="M7 7l5 5 5-5" />
+        <path d="M7 13l5 5 5-5" />
+      </motion.svg>
+    )
+  }
+  if (action === 'lighter') {
+    return (
+      <motion.svg {...svg} animate={{ y: [0, -4, 0] }} transition={drift}>
+        <path d="M7 12l5-5 5 5" />
+        <path d="M7 18l5-5 5 5" />
+      </motion.svg>
+    )
+  }
+  return (
+    <motion.svg
+      {...svg}
+      initial={{ scale: 0.5, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 18 }}
+    >
+      <path d="M5 13l4 4 10-11" />
+    </motion.svg>
+  )
 }
 
 export function TransitionScreen({
@@ -67,7 +100,7 @@ export function TransitionScreen({
   return (
     <motion.div
       className="absolute inset-0 flex flex-col"
-      style={{ background: transitionBg(action) }}
+      style={{ background: BACKGROUND }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -98,32 +131,42 @@ export function TransitionScreen({
 
         {/* Centered hand-off */}
         <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
+          {/* Direction */}
+          <motion.div
+            className="flex h-[74px] w-[74px] items-center justify-center rounded-full border border-white/15 bg-white/10 text-white"
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 240, damping: 18 }}
+          >
+            <ActionIcon action={action} />
+          </motion.div>
+
           {/* What just happened */}
           <motion.div
-            className="text-[26px] font-semibold tracking-[-0.01em] text-white/90"
+            className="mt-5 text-[22px] font-semibold tracking-[-0.01em] text-white/90"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ delay: 0.06, duration: 0.4 }}
           >
             {actionLabel(action)}
           </motion.div>
 
           {/* Who's next */}
           <motion.div
-            className="mt-10"
+            className="mt-8"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.45 }}
+            transition={{ delay: 0.12, duration: 0.45 }}
           >
             <div className="text-[15px] font-medium text-white/55">
               Pass the phone to
             </div>
-            <div className="mt-1 text-[36px] font-bold leading-tight tracking-[-0.01em]">
+            <div className="mt-1 text-[34px] font-bold leading-tight tracking-[-0.01em]">
               {nextPlayerName}
             </div>
           </motion.div>
 
-          <div className="mt-12 h-6">
+          <div className="mt-10 h-6">
             {ready ? (
               <motion.div
                 className="text-[14px] font-semibold text-white/80"

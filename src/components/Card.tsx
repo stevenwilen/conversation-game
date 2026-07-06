@@ -162,9 +162,11 @@ export function Card({
             {text}
           </p>
 
-          {/* Quiet reminder that the card is tappable */}
+          {/* Quiet reminder that the card is tappable. Tapping ends the turn
+              (you tap once the question has been answered aloud), it doesn't
+              answer for you — hence "when done", not "to answer". */}
           <div className="text-[13px] font-medium text-[var(--color-ink)]/35">
-            Tap to answer
+            Tap when done
           </div>
         </motion.div>
       </motion.div>
