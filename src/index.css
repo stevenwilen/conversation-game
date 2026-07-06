@@ -15,26 +15,31 @@
 }
 
 /* ---- Base --------------------------------------------------------------- */
-html,
-body {
+html {
   height: 100%;
-  /* Lock the document: no page scroll, no rubber-band overscroll, and no
-     iOS Safari toolbar-collapse jank (the "black bar" that needed a scroll
-     to clear). The only scrolling happens inside the app's own containers. */
+  /* Dark base behind everything, so any overscroll strip that iOS reveals
+     matches the app frame instead of flashing white. */
+  background: #14101a;
   overflow: hidden;
   overscroll-behavior: none;
 }
 
 body {
   margin: 0;
+  /* Lock the page to the viewport so iOS Safari can't rubber-band and reveal
+     blank space above/below the app. `position: fixed` is the key part: with no
+     scrollable document there is nothing to bounce. Scrolling only happens
+     inside the app's own containers (e.g. the setup list). */
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
   background: #14101a;
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  /* Mobile feel: no rubber-band scroll, no tap flash, no accidental text select */
-  overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
 }

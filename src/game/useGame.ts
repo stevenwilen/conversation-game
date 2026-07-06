@@ -17,7 +17,10 @@ import { FRIENDSHIP, pickCard } from './cards'
 // answering; it just sets the depth for whoever is next. A pending transition
 // can be undone (e.g. an accidental tap) before continuing to the next player.
 
-const STORAGE_KEY = 'cg:v1'
+// Bump this to invalidate older saved games so a new version starts fresh and
+// overrides any state left over from a previous version.
+const STORAGE_KEY = 'cg:v2'
+const LEGACY_KEYS = ['cg:v1']
 
 export interface GameState {
   screen: Screen
@@ -148,6 +151,8 @@ function reducer(state: GameState, action: Action): GameState {
 
 function loadInitial(): GameState {
   try {
+    // Drop superseded saves so this version overrides any older stored game.
+    for (const key of LEGACY_KEYS) localStorage.removeItem(key)
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return initialState
     const parsed = JSON.parse(raw) as Partial<GameState> | null
