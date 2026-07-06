@@ -1,0 +1,76 @@
+@import 'tailwindcss';
+
+/* ---- Design tokens ------------------------------------------------------ */
+@theme {
+  --font-sans:
+    'SF Pro Display', system-ui, -apple-system, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
+
+  --color-ink: #1a1420;
+  --color-cream: #fdf7f2;
+
+  --radius-card: 32px;
+
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---- Base --------------------------------------------------------------- */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #14101a;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* Mobile feel: no rubber-band scroll, no tap flash, no accidental text select */
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+#root {
+  min-height: 100dvh;
+  isolation: isolate;
+}
+
+/* The whole app is a "handled object", not a document — disable selection,
+   but re-enable inside inputs so setup still works. */
+.app-surface {
+  user-select: none;
+  -webkit-user-select: none;
+}
+.app-surface input {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Respect users who prefer less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Utility: clamp the app to a phone-like column even on wide screens, and
+   pad for iPhone safe areas (notch / home indicator). */
+.phone-frame {
+  width: 100%;
+  max-width: 480px;
+  margin-inline: auto;
+  height: 100dvh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
