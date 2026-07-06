@@ -32,9 +32,6 @@ export function GestureHints({ canLighter, canDeeper }: GestureHintsProps) {
           deeper ›
         </span>
       </div>
-      <div className="text-[12px] font-medium text-white/70">
-        hold or turn the phone to open to the group
-      </div>
     </div>
   )
 }

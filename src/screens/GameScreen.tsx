@@ -1,9 +1,7 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { Depth } from '../game/types'
 import { DEPTH_THEME, depthBackground } from '../game/theme'
-import { useDeviceFlip } from '../hooks/useDeviceFlip'
-import { useHaptics } from '../hooks/useHaptics'
 import { Card } from '../components/Card'
 import { DepthMeter } from '../components/DepthMeter'
 import { GestureHints } from '../components/GestureHints'
@@ -16,12 +14,10 @@ interface GameScreenProps {
   depth: Depth
   card: string
   spotlightName: string
-  motionEnabled: boolean
   seenCoach: boolean
   onAnswer: () => void
   onLighter: () => void
   onDeeper: () => void
-  onOpen: () => void
   onEnd: () => void
   onDismissCoach: () => void
 }
@@ -30,29 +26,19 @@ export function GameScreen({
   depth,
   card,
   spotlightName,
-  motionEnabled,
   seenCoach,
   onAnswer,
   onLighter,
   onDeeper,
-  onOpen,
   onEnd,
   onDismissCoach,
 }: GameScreenProps) {
   const theme = DEPTH_THEME[depth]
   const canLighter = depth > 1
   const canDeeper = depth < 5
-  const haptic = useHaptics()
 
   const [showCoach, setShowCoach] = useState(!seenCoach)
   const [nudge, setNudge] = useState(false)
-
-  // "Turn the phone around" -> open to group (real devices only).
-  const handleFlipOpen = useCallback(() => {
-    haptic('open')
-    onOpen()
-  }, [haptic, onOpen])
-  useDeviceFlip(motionEnabled, handleFlipOpen)
 
   function dismissCoach() {
     setShowCoach(false)
@@ -111,7 +97,6 @@ export function GameScreen({
                 onAnswer={onAnswer}
                 onLighter={onLighter}
                 onDeeper={onDeeper}
-                onOpen={onOpen}
               />
             </div>
           </div>

@@ -3,10 +3,10 @@ import { motion } from 'framer-motion'
 import type { TurnAction } from '../game/types'
 import { useHaptics } from '../hooks/useHaptics'
 
-// The hand-off. Appears after EVERY action to (a) move the spotlight clearly to
-// the next player and (b) pace the game — the next card can't be revealed until
-// a short dwell passes and the phone is deliberately tapped. This is what stops
-// rapid chain-swiping through cards.
+// The hand-off. Appears after EVERY action to (a) name the action just taken and
+// move the spotlight clearly to the next player, and (b) pace the game — the
+// next card can't be revealed until a short dwell passes and the phone is
+// deliberately tapped. This is what stops rapid chain-swiping through cards.
 
 interface TransitionScreenProps {
   nextPlayerName: string
@@ -19,11 +19,9 @@ const DWELL_MS = 900
 function actionLabel(action: TurnAction | null): string {
   switch (action) {
     case 'lighter':
-      return 'Going lighter'
+      return 'Going lighter…'
     case 'deeper':
-      return 'Going deeper'
-    case 'open':
-      return 'Opened to the group'
+      return 'Going deeper…'
     case 'answer':
       return 'Answered'
     default:
@@ -49,8 +47,6 @@ export function TransitionScreen({
     haptic('pass')
   }, [haptic])
 
-  const initial = nextPlayerName.trim().charAt(0).toUpperCase() || '?'
-
   return (
     <motion.div
       className="absolute inset-0 flex flex-col"
@@ -66,8 +62,9 @@ export function TransitionScreen({
       }}
     >
       <div className="phone-frame items-center justify-center px-8 text-center text-white">
+        {/* What just happened */}
         <motion.div
-          className="text-[13px] font-semibold uppercase tracking-[0.28em] text-white/55"
+          className="text-[26px] font-semibold tracking-[-0.01em] text-white/90"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
@@ -75,25 +72,17 @@ export function TransitionScreen({
           {actionLabel(action)}
         </motion.div>
 
+        {/* Who's next */}
         <motion.div
-          className="mt-8 flex h-24 w-24 items-center justify-center rounded-full border border-white/20 bg-white/10 text-4xl font-bold"
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.05, type: 'spring', stiffness: 240, damping: 18 }}
-        >
-          {initial}
-        </motion.div>
-
-        <motion.div
-          className="mt-8"
+          className="mt-10"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.12, duration: 0.45 }}
+          transition={{ delay: 0.1, duration: 0.45 }}
         >
-          <div className="text-[15px] font-medium text-white/60">
+          <div className="text-[15px] font-medium text-white/55">
             Pass the phone to
           </div>
-          <div className="mt-1 text-[34px] font-bold leading-tight tracking-[-0.01em]">
+          <div className="mt-1 text-[36px] font-bold leading-tight tracking-[-0.01em]">
             {nextPlayerName}
           </div>
         </motion.div>

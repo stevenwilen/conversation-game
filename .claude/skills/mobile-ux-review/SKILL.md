@@ -14,7 +14,7 @@ Check:
 - Is the card the visual focus?
 - Can someone read the card easily while holding the phone?
 - Are the gestures obvious without big buttons?
-- Is tap/swipe/long-press behavior clear?
+- Is tap/swipe behavior clear?
 - Is the current depth obvious?
 - Is the next action obvious?
 - Does the interface avoid clutter?

@@ -33,11 +33,9 @@ Every game screen should have:
 
 ## Main Gameplay Gestures
 
-- Tap card: answer / stay
+- Tap card: answer / stay (also used to continue after the group answers)
 - Swipe left: go lighter
 - Swipe right: go deeper
-- Turn phone around: open to group
-- Long press: fallback open to group
 - Pivot disabled for the first prototype
 
 ## Do Not Add

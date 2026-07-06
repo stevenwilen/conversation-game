@@ -12,7 +12,7 @@ export type DeckId = 'friendship'
 export type Screen = 'start' | 'setup' | 'playing' | 'transition' | 'end'
 
 /** What the spotlight player did with the card. */
-export type TurnAction = 'answer' | 'lighter' | 'deeper' | 'open'
+export type TurnAction = 'answer' | 'lighter' | 'deeper'
 
 export interface Player {
   id: string

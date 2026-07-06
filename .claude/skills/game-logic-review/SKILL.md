@@ -11,12 +11,11 @@ Review the game logic against the locked rules in CLAUDE.md.
 - Player-facing system is Deck + Depth + Spotlight choice.
 - No player-facing Risk, Tone, or Topic.
 - No redraw mechanic.
-- Tap answers / stays at current depth.
+- Tap answers / stays at current depth (also completes the turn after the group answers).
 - Swipe left goes lighter.
 - Swipe right goes deeper.
 - Depth cannot go below 1 or above 5.
-- Open to Group uses phone turn/orientation when possible.
-- Long press is fallback for Open to Group.
+- There is no separate "open to group" gesture (removed — it duplicated tap).
 - Pivot is disabled until multiple decks exist.
 - If a player steers, they do not answer.
 - A next-player transition appears after every action.

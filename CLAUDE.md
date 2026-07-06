@@ -83,12 +83,12 @@ The main game screen should feel gesture-based and mobile-native.
 
 Player actions:
 
-- Tap the card: answer the card / stay at the current depth
+- Tap the card: answer the card, or complete the turn after the group answers, at the current depth
 - Swipe left: go lighter
 - Swipe right: go deeper
-- Turn the phone around: open the card to the group
-- Long press: fallback for open to group if device orientation does not work
 - Pivot: disabled until multiple decks exist
+
+Showing a card to the group is informal — the spotlight player can read it aloud or hand the phone around, then tap to continue. There is no separate "open to group" gesture: it produced the same result as a tap (complete the turn, same depth, pass the spotlight), so it was removed to keep the model simple.
 
 The game should not feel like a form with buttons. It should feel like a physical card being handled on a phone.
 
@@ -99,7 +99,7 @@ Do not add a redraw or replacement-card mechanic.
 If a player does not have an answer, they can:
 
 - answer the closest honest version
-- open the card to the group
+- let the group answer it, then tap to continue
 - steer away by going deeper or going lighter
 
 ## Turn Transition

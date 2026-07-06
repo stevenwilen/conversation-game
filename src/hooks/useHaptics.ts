@@ -5,12 +5,10 @@ import { useCallback } from 'react'
 // on iPhone these calls do nothing — this is an Android/desktop enhancement, a
 // known web-platform limitation (see summary tradeoffs).
 
-export type HapticKind = 'light' | 'commit' | 'open' | 'pass'
+export type HapticKind = 'commit' | 'pass'
 
 const PATTERNS: Record<HapticKind, number | number[]> = {
-  light: 10,
   commit: 18,
-  open: [10, 30, 22],
   pass: [0, 26, 34, 18],
 }
 

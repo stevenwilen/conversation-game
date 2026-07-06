@@ -26,26 +26,29 @@ export function EndScreen({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.28 }}
     >
-      <div className="phone-frame justify-between px-8 pb-12 pt-24 text-white">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <h1
-            className="text-[52px] font-bold leading-[1.05] tracking-[-0.02em]"
-            style={{ textShadow: '0 2px 26px rgba(0,0,0,0.16)' }}
+      <div className="phone-frame px-8 pb-12 pt-16 text-white">
+        {/* Heading centered in the space above the buttons */}
+        <div className="flex flex-1 flex-col justify-center">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            Good talk.
-          </h1>
-          <p
-            className="mt-5 max-w-[19rem] text-[17px] font-medium leading-snug text-white/85"
-            style={{ textShadow: '0 1px 16px rgba(0,0,0,0.14)' }}
-          >
-            However deep you went, you got there together. Come back when you
-            want to go further.
-          </p>
-        </motion.div>
+            <h1
+              className="text-[52px] font-bold leading-[1.05] tracking-[-0.02em]"
+              style={{ textShadow: '0 2px 26px rgba(0,0,0,0.16)' }}
+            >
+              Good talk.
+            </h1>
+            <p
+              className="mt-5 max-w-[19rem] text-[17px] font-medium leading-snug text-white/85"
+              style={{ textShadow: '0 1px 16px rgba(0,0,0,0.14)' }}
+            >
+              However deep you went, you got there together. Come back when you
+              want to go further.
+            </p>
+          </motion.div>
+        </div>
 
         <motion.div
           className="flex flex-col gap-3"
