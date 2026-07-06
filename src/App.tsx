@@ -42,11 +42,13 @@ function App() {
             card={state.card}
             spotlightName={spotlight?.name ?? 'Player'}
             motionEnabled={motionEnabled}
+            seenCoach={state.seenCoach}
             onAnswer={() => actions.act('answer')}
             onLighter={() => actions.act('lighter')}
             onDeeper={() => actions.act('deeper')}
             onOpen={() => actions.act('open')}
             onEnd={actions.end}
+            onDismissCoach={actions.dismissCoach}
           />
         )}
 

@@ -26,6 +26,8 @@ export interface GameState {
   depth: Depth
   card: string
   lastAction: TurnAction | null
+  /** Has the one-time first-card gesture coach been dismissed? Persisted. */
+  seenCoach: boolean
 }
 
 const initialState: GameState = {
@@ -36,6 +38,7 @@ const initialState: GameState = {
   depth: 1,
   card: '',
   lastAction: null,
+  seenCoach: false,
 }
 
 type Action =
@@ -46,6 +49,7 @@ type Action =
   | { type: 'END' }
   | { type: 'PLAY_AGAIN' }
   | { type: 'NEW_GAME' }
+  | { type: 'DISMISS_COACH' }
   | { type: 'QUIT' }
 
 function clampDepth(value: number): Depth {
@@ -105,8 +109,12 @@ function reducer(state: GameState, action: Action): GameState {
     case 'NEW_GAME':
       return { ...state, screen: 'setup' }
 
+    case 'DISMISS_COACH':
+      return { ...state, seenCoach: true }
+
     case 'QUIT':
-      return { ...initialState }
+      // Reset everything except the "already learned the gestures" flag.
+      return { ...initialState, seenCoach: state.seenCoach }
 
     default:
       return state
@@ -162,6 +170,7 @@ export function useGame() {
       end: () => dispatch({ type: 'END' }),
       playAgain: () => dispatch({ type: 'PLAY_AGAIN' }),
       newGame: () => dispatch({ type: 'NEW_GAME' }),
+      dismissCoach: () => dispatch({ type: 'DISMISS_COACH' }),
       quit: () => dispatch({ type: 'QUIT' }),
     }),
     [],

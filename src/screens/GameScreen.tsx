@@ -1,10 +1,13 @@
-import { motion } from 'framer-motion'
+import { useCallback, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import type { Depth } from '../game/types'
 import { DEPTH_THEME, depthBackground } from '../game/theme'
 import { useDeviceFlip } from '../hooks/useDeviceFlip'
+import { useHaptics } from '../hooks/useHaptics'
 import { Card } from '../components/Card'
 import { DepthMeter } from '../components/DepthMeter'
 import { GestureHints } from '../components/GestureHints'
+import { CoachOverlay } from '../components/CoachOverlay'
 
 // The main event. The card is the hero; everything else is a quiet HUD.
 // All turn actions are gestures on the card — no button grid.
@@ -14,11 +17,13 @@ interface GameScreenProps {
   card: string
   spotlightName: string
   motionEnabled: boolean
+  seenCoach: boolean
   onAnswer: () => void
   onLighter: () => void
   onDeeper: () => void
   onOpen: () => void
   onEnd: () => void
+  onDismissCoach: () => void
 }
 
 export function GameScreen({
@@ -26,18 +31,34 @@ export function GameScreen({
   card,
   spotlightName,
   motionEnabled,
+  seenCoach,
   onAnswer,
   onLighter,
   onDeeper,
   onOpen,
   onEnd,
+  onDismissCoach,
 }: GameScreenProps) {
   const theme = DEPTH_THEME[depth]
   const canLighter = depth > 1
   const canDeeper = depth < 5
+  const haptic = useHaptics()
+
+  const [showCoach, setShowCoach] = useState(!seenCoach)
+  const [nudge, setNudge] = useState(false)
 
   // "Turn the phone around" -> open to group (real devices only).
-  useDeviceFlip(motionEnabled, onOpen)
+  const handleFlipOpen = useCallback(() => {
+    haptic('open')
+    onOpen()
+  }, [haptic, onOpen])
+  useDeviceFlip(motionEnabled, handleFlipOpen)
+
+  function dismissCoach() {
+    setShowCoach(false)
+    onDismissCoach()
+    setNudge(true) // one-time "you can swipe me" wiggle right after teaching
+  }
 
   return (
     <motion.div
@@ -49,30 +70,32 @@ export function GameScreen({
       transition={{ duration: 0.3 }}
     >
       <div className="phone-frame">
-        {/* HUD */}
+        {/* HUD: depth left, End isolated top-right so it can't be fat-fingered */}
         <header className="flex items-center justify-between px-5 pt-4">
           <DepthMeter depth={depth} />
-
-          <div className="flex items-center gap-2">
-            <div className="inline-flex items-center gap-2 rounded-full bg-black/15 py-1.5 pl-2.5 pr-3.5 text-white backdrop-blur-sm">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
-              </span>
-              <span className="max-w-[7.5rem] truncate text-[13px] font-semibold">
-                {spotlightName}
-              </span>
-            </div>
-
-            <button
-              type="button"
-              onClick={onEnd}
-              className="rounded-full bg-black/15 px-3 py-1.5 text-[13px] font-semibold text-white backdrop-blur-sm"
-            >
-              End
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onEnd}
+            className="rounded-full bg-black/12 px-3 py-1.5 text-[12px] font-semibold text-white/75 backdrop-blur-sm"
+          >
+            End
+          </button>
         </header>
+
+        {/* Spotlight — the loudest piece of state (P4) */}
+        <div className="flex items-center justify-center gap-2 px-5 pt-3">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/70" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-white" />
+          </span>
+          <span
+            className="max-w-[16rem] truncate text-[19px] font-bold tracking-tight text-white"
+            style={{ textShadow: '0 1px 14px rgba(0,0,0,0.25)' }}
+          >
+            {spotlightName}
+            <span className="font-medium text-white/70">’s turn</span>
+          </span>
+        </div>
 
         {/* Card stage */}
         <main className="relative flex flex-1 flex-col px-5 pb-8 pt-3">
@@ -84,6 +107,7 @@ export function GameScreen({
                 glow={theme.glow}
                 canLighter={canLighter}
                 canDeeper={canDeeper}
+                nudge={nudge}
                 onAnswer={onAnswer}
                 onLighter={onLighter}
                 onDeeper={onDeeper}
@@ -97,6 +121,11 @@ export function GameScreen({
           </div>
         </main>
       </div>
+
+      {/* First-run gesture coach (P2) */}
+      <AnimatePresence>
+        {showCoach && <CoachOverlay onDismiss={dismissCoach} />}
+      </AnimatePresence>
     </motion.div>
   )
 }

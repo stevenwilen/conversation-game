@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import type { TurnAction } from '../game/types'
+import { useHaptics } from '../hooks/useHaptics'
 
 // The hand-off. Appears after EVERY action to (a) move the spotlight clearly to
 // the next player and (b) pace the game — the next card can't be revealed until
@@ -36,11 +37,17 @@ export function TransitionScreen({
   onContinue,
 }: TransitionScreenProps) {
   const [ready, setReady] = useState(false)
+  const haptic = useHaptics()
 
   useEffect(() => {
     const timer = window.setTimeout(() => setReady(true), DWELL_MS)
     return () => window.clearTimeout(timer)
   }, [])
+
+  // A little buzz as the phone is handed over (P5).
+  useEffect(() => {
+    haptic('pass')
+  }, [haptic])
 
   const initial = nextPlayerName.trim().charAt(0).toUpperCase() || '?'
 
