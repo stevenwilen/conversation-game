@@ -54,10 +54,12 @@ body {
 }
 
 /* The whole app is a "handled object", not a document — disable selection,
-   but re-enable inside inputs so setup still works. */
+   but re-enable inside inputs so setup still works. `touch-action: manipulation`
+   removes double-tap-to-zoom (panning inside the setup list still works). */
 .app-surface {
   user-select: none;
   -webkit-user-select: none;
+  touch-action: manipulation;
 }
 .app-surface input {
   user-select: text;
