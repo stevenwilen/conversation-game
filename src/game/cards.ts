@@ -26,14 +26,40 @@ export const FRIENDSHIP: Deck = {
 
 export const DECKS: Deck[] = [FRIENDSHIP]
 
-/** Pick a prompt for a depth, avoiding an immediate repeat when possible. */
-export function pickCard(deck: Deck, depth: Depth, avoid?: string): string {
-  const pool = deck.cards[depth]
-  if (pool.length <= 1) return pool[0]
-  let card = pool[Math.floor(Math.random() * pool.length)]
-  let guard = 0
-  while (card === avoid && guard++ < 8) {
-    card = pool[Math.floor(Math.random() * pool.length)]
+/** Per-depth queues of the remaining shuffled prompts for the current cycle. */
+export type DeckQueues = Record<Depth, string[]>
+
+export function emptyQueues(): DeckQueues {
+  return { 1: [], 2: [], 3: [], 4: [], 5: [] }
+}
+
+function shuffle(items: string[]): string[] {
+  const result = items.slice()
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const tmp = result[i]
+    result[i] = result[j]
+    result[j] = tmp
   }
-  return card
+  return result
+}
+
+// Draw the next prompt for a depth from a shuffled queue: every question in the
+// level appears once before any repeats. Refills with a fresh shuffle when the
+// level is exhausted, avoiding an immediate repeat across that boundary.
+export function dealCard(
+  deck: Deck,
+  queues: DeckQueues,
+  depth: Depth,
+  avoid?: string,
+): { card: string; queues: DeckQueues } {
+  let queue = (queues[depth] ?? []).slice()
+  if (queue.length === 0) {
+    queue = shuffle(deck.cards[depth])
+    if (avoid && queue.length > 1 && queue[0] === avoid) {
+      queue.push(queue.shift() as string)
+    }
+  }
+  const card = queue.shift() as string
+  return { card, queues: { ...queues, [depth]: queue } }
 }

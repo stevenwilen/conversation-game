@@ -6,7 +6,8 @@ import type {
   Screen,
   TurnAction,
 } from './types'
-import { FRIENDSHIP, pickCard } from './cards'
+import { FRIENDSHIP, dealCard, emptyQueues } from './cards'
+import type { DeckQueues } from './cards'
 
 // Single source of truth for the game. A tiny state machine over the five
 // screens, persisted to localStorage so a refresh resumes mid-game.
@@ -34,6 +35,8 @@ export interface GameState {
   seenCoach: boolean
   /** Depth before the pending action, so the transition can be undone. */
   prevDepth: Depth | null
+  /** Remaining shuffled prompts per depth, so questions don't repeat early. */
+  queues: DeckQueues
 }
 
 const initialState: GameState = {
@@ -46,6 +49,7 @@ const initialState: GameState = {
   lastAction: null,
   seenCoach: false,
   prevDepth: null,
+  queues: emptyQueues(),
 }
 
 type Action =
@@ -71,17 +75,22 @@ function reducer(state: GameState, action: Action): GameState {
     case 'OPEN_SETUP':
       return { ...state, screen: 'setup' }
 
-    case 'START':
+    case 'START': {
+      const dealt = dealCard(FRIENDSHIP, emptyQueues(), action.depth)
       return {
         ...state,
         players: action.players,
         spotlightIndex: 0,
         depth: action.depth,
-        card: pickCard(FRIENDSHIP, action.depth),
+        card: dealt.card,
+        queues: dealt.queues,
+        // Show the gesture coach at the start of every game, not just the first.
+        seenCoach: false,
         lastAction: null,
         prevDepth: null,
         screen: 'playing',
       }
+    }
 
     case 'ACT': {
       let depth = state.depth
@@ -99,10 +108,12 @@ function reducer(state: GameState, action: Action): GameState {
     case 'CONTINUE': {
       const count = state.players.length
       const nextIndex = count > 0 ? (state.spotlightIndex + 1) % count : 0
+      const dealt = dealCard(FRIENDSHIP, state.queues, state.depth, state.card)
       return {
         ...state,
         spotlightIndex: nextIndex,
-        card: pickCard(FRIENDSHIP, state.depth, state.card),
+        card: dealt.card,
+        queues: dealt.queues,
         lastAction: null,
         prevDepth: null,
         screen: 'playing',
@@ -123,16 +134,21 @@ function reducer(state: GameState, action: Action): GameState {
     case 'END':
       return { ...state, screen: 'end' }
 
-    case 'PLAY_AGAIN':
+    case 'PLAY_AGAIN': {
+      const dealt = dealCard(FRIENDSHIP, emptyQueues(), 1)
       return {
         ...state,
         spotlightIndex: 0,
         depth: 1,
-        card: pickCard(FRIENDSHIP, 1),
+        card: dealt.card,
+        queues: dealt.queues,
+        // Fresh game — show the coach again and reshuffle.
+        seenCoach: false,
         lastAction: null,
         prevDepth: null,
         screen: 'playing',
       }
+    }
 
     case 'NEW_GAME':
       return { ...state, screen: 'setup' }
@@ -164,7 +180,9 @@ function loadInitial(): GameState {
       (merged.screen === 'playing' || merged.screen === 'transition') &&
       !merged.card
     ) {
-      merged.card = pickCard(FRIENDSHIP, merged.depth)
+      const dealt = dealCard(FRIENDSHIP, merged.queues, merged.depth)
+      merged.card = dealt.card
+      merged.queues = dealt.queues
     }
     return merged
   } catch {
