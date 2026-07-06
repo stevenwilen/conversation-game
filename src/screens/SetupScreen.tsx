@@ -66,7 +66,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
         </div>
 
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto px-6 pb-4">
+        <div className="flex-1 overflow-y-auto overscroll-y-contain px-6 pb-4">
           <h1 className="mt-4 text-[34px] font-bold leading-tight tracking-[-0.01em]">
             Who's playing?
           </h1>

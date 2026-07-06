@@ -18,6 +18,11 @@
 html,
 body {
   height: 100%;
+  /* Lock the document: no page scroll, no rubber-band overscroll, and no
+     iOS Safari toolbar-collapse jank (the "black bar" that needed a scroll
+     to clear). The only scrolling happens inside the app's own containers. */
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 body {
@@ -35,7 +40,11 @@ body {
 }
 
 #root {
-  min-height: 100dvh;
+  /* Pin the app to the visible viewport so iOS Safari can't reveal the page
+     background around it, and so page scroll can't push the toolbars around. */
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
   isolation: isolate;
 }
 
@@ -66,8 +75,7 @@ body {
   width: 100%;
   max-width: 480px;
   margin-inline: auto;
-  height: 100dvh;
-  min-height: 100dvh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   position: relative;

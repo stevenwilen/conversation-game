@@ -1,17 +1,15 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { animate, motion, useMotionValue, useTransform } from 'framer-motion'
 import type { PanInfo } from 'framer-motion'
 import { useHaptics } from '../hooks/useHaptics'
 
 // The card is the hero object. It is handled, not clicked:
-//   tap          -> answer / complete the turn (whether you answered or the
-//                   group did) at the current depth
-//   swipe left   -> lighter
-//   swipe right  -> deeper
+//   tap          -> answer / complete the turn
+//   swipe left   -> lighter   (blocked at Depth 1 — the card won't drag there)
+//   swipe right  -> deeper    (blocked at Depth 5 — the card won't drag there)
 //
-// Feedback layers: directional stamps on drag, a stacked deck + settle +
-// first-card nudge for physicality (P3), prompt-length aware type (P6), and a
-// haptic on swipe commit (P5).
+// A committed swipe must never also register as a tap, or the turn would be
+// mislabelled "Answered". `committedRef` guards against that.
 
 interface CardProps {
   text: string
@@ -52,17 +50,26 @@ export function Card({
 
   const x = useMotionValue(0)
   const rotate = useTransform(x, [-220, 220], [-9, 9])
+  const committedRef = useRef(false)
 
-  // Gentle one-time wiggle implying "you can swipe me" (P3).
+  // Gentle one-time wiggle implying "you can swipe me" (P3). Only wiggles toward
+  // directions that are actually available at this depth.
   useEffect(() => {
     if (!nudge) return
-    const controls = animate(x, [0, 24, -24, 0], {
+    const keyframes =
+      canLighter && canDeeper
+        ? [0, 22, -22, 0]
+        : canDeeper
+          ? [0, 26, 0]
+          : canLighter
+            ? [0, -26, 0]
+            : [0]
+    const controls = animate(x, keyframes, {
       duration: 1.2,
       ease: 'easeInOut',
-      times: [0, 0.34, 0.68, 1],
     })
     return () => controls.stop()
-  }, [nudge, x])
+  }, [nudge, canLighter, canDeeper, x])
 
   function handleDragEnd(
     _event: MouseEvent | TouchEvent | PointerEvent,
@@ -73,13 +80,24 @@ export function Card({
     const goRight = dx > SWIPE_DISTANCE || vx > SWIPE_VELOCITY
     const goLeft = dx < -SWIPE_DISTANCE || vx < -SWIPE_VELOCITY
     if (goRight && canDeeper) {
+      committedRef.current = true
       haptic('commit')
       onDeeper()
     } else if (goLeft && canLighter) {
+      committedRef.current = true
       haptic('commit')
       onLighter()
     }
     // Otherwise dragSnapToOrigin springs the card back into place.
+  }
+
+  function handleTap() {
+    // A committed swipe already handled this gesture — don't also answer.
+    if (committedRef.current) {
+      committedRef.current = false
+      return
+    }
+    onAnswer()
   }
 
   return (
@@ -96,16 +114,22 @@ export function Card({
         style={{ transform: 'translateY(11px) scale(0.96) rotate(-2deg)' }}
       />
 
-      {/* Active card */}
+      {/* Active card. Drag is locked to available directions: no lighter at
+          Depth 1, no deeper at Depth 5 — so the card won't even tilt that way. */}
       <motion.div
         className="relative z-10 flex touch-none select-none flex-col"
         style={{ x, rotate }}
         drag="x"
         dragSnapToOrigin
-        dragElastic={0.55}
+        dragElastic={{
+          left: canLighter ? 0.55 : 0,
+          right: canDeeper ? 0.55 : 0,
+          top: 0,
+          bottom: 0,
+        }}
         dragConstraints={{ left: 0, right: 0 }}
         onDragEnd={handleDragEnd}
-        onTap={onAnswer}
+        onTap={handleTap}
         whileTap={{ scale: 0.985 }}
         initial={{ opacity: 0, y: 26, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}

@@ -11,10 +11,11 @@ import { FRIENDSHIP, pickCard } from './cards'
 // Single source of truth for the game. A tiny state machine over the five
 // screens, persisted to localStorage so a refresh resumes mid-game.
 //
-// Turn model (locked in CLAUDE.md): every completed action — answer, open,
-// lighter, deeper — shows a transition and rotates the spotlight. Depth is a
-// shared group state that carries to the next player. Steering (lighter/deeper)
-// is NOT answering; it just sets the depth for whoever is next.
+// Turn model (locked in CLAUDE.md): every completed action — answer, lighter,
+// deeper — shows a transition and rotates the spotlight. Depth is a shared
+// group state that carries to the next player. Steering (lighter/deeper) is NOT
+// answering; it just sets the depth for whoever is next. A pending transition
+// can be undone (e.g. an accidental tap) before continuing to the next player.
 
 const STORAGE_KEY = 'cg:v1'
 
@@ -28,6 +29,8 @@ export interface GameState {
   lastAction: TurnAction | null
   /** Has the one-time first-card gesture coach been dismissed? Persisted. */
   seenCoach: boolean
+  /** Depth before the pending action, so the transition can be undone. */
+  prevDepth: Depth | null
 }
 
 const initialState: GameState = {
@@ -39,6 +42,7 @@ const initialState: GameState = {
   card: '',
   lastAction: null,
   seenCoach: false,
+  prevDepth: null,
 }
 
 type Action =
@@ -46,6 +50,7 @@ type Action =
   | { type: 'START'; players: Player[]; depth: Depth }
   | { type: 'ACT'; action: TurnAction }
   | { type: 'CONTINUE' }
+  | { type: 'UNDO' }
   | { type: 'END' }
   | { type: 'PLAY_AGAIN' }
   | { type: 'NEW_GAME' }
@@ -71,6 +76,7 @@ function reducer(state: GameState, action: Action): GameState {
         depth: action.depth,
         card: pickCard(FRIENDSHIP, action.depth),
         lastAction: null,
+        prevDepth: null,
         screen: 'playing',
       }
 
@@ -78,7 +84,13 @@ function reducer(state: GameState, action: Action): GameState {
       let depth = state.depth
       if (action.action === 'lighter') depth = clampDepth(depth - 1)
       if (action.action === 'deeper') depth = clampDepth(depth + 1)
-      return { ...state, depth, lastAction: action.action, screen: 'transition' }
+      return {
+        ...state,
+        depth,
+        prevDepth: state.depth,
+        lastAction: action.action,
+        screen: 'transition',
+      }
     }
 
     case 'CONTINUE': {
@@ -89,9 +101,21 @@ function reducer(state: GameState, action: Action): GameState {
         spotlightIndex: nextIndex,
         card: pickCard(FRIENDSHIP, state.depth, state.card),
         lastAction: null,
+        prevDepth: null,
         screen: 'playing',
       }
     }
+
+    case 'UNDO':
+      // Revert an accidental action and return to the same card / same player,
+      // restoring the depth from before the action.
+      return {
+        ...state,
+        depth: state.prevDepth ?? state.depth,
+        lastAction: null,
+        prevDepth: null,
+        screen: 'playing',
+      }
 
     case 'END':
       return { ...state, screen: 'end' }
@@ -103,6 +127,7 @@ function reducer(state: GameState, action: Action): GameState {
         depth: 1,
         card: pickCard(FRIENDSHIP, 1),
         lastAction: null,
+        prevDepth: null,
         screen: 'playing',
       }
 
@@ -167,6 +192,7 @@ export function useGame() {
       act: (turnAction: TurnAction) =>
         dispatch({ type: 'ACT', action: turnAction }),
       continueTurn: () => dispatch({ type: 'CONTINUE' }),
+      undo: () => dispatch({ type: 'UNDO' }),
       end: () => dispatch({ type: 'END' }),
       playAgain: () => dispatch({ type: 'PLAY_AGAIN' }),
       newGame: () => dispatch({ type: 'NEW_GAME' }),

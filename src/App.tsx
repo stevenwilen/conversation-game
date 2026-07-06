@@ -13,7 +13,7 @@ function App() {
   const { state, spotlight, nextPlayer, actions } = useGame()
 
   return (
-    <div className="app-surface relative min-h-dvh overflow-hidden bg-[#14101a]">
+    <div className="app-surface relative h-full overflow-hidden bg-[#14101a]">
       <AnimatePresence mode="wait">
         {state.screen === 'start' && (
           <StartScreen key="start" onNewGame={actions.openSetup} />
@@ -44,6 +44,7 @@ function App() {
             nextPlayerName={nextPlayer?.name ?? 'the next player'}
             action={state.lastAction}
             onContinue={actions.continueTurn}
+            onUndo={actions.undo}
           />
         )}
 
