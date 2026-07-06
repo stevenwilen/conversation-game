@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { END_BG } from '../game/theme'
 
 // Calm, warm close. No scores, no stats — just a good note to end on and an
 // easy way back in.
@@ -17,10 +18,7 @@ export function EndScreen({
   return (
     <motion.div
       className="absolute inset-0 flex flex-col"
-      style={{
-        background:
-          'linear-gradient(160deg, #FFD3A6 0%, #F5849E 55%, #9E77DE 100%)',
-      }}
+      style={{ background: END_BG }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

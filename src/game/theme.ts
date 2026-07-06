@@ -1,4 +1,4 @@
-import type { Depth } from './types'
+import type { Depth, Screen } from './types'
 
 // Visual identity for each depth level. Depth is communicated with COLOR
 // (background gradient + accent) as well as a label, so the current depth is
@@ -66,4 +66,30 @@ export const DEPTH_THEME: Record<Depth, DepthTheme> = {
 export function depthBackground(depth: Depth): string {
   const t = DEPTH_THEME[depth]
   return `linear-gradient(160deg, ${t.bgFrom} 0%, ${t.bgTo} 100%)`
+}
+
+// Full-screen gradient for each screen. Single source of truth: the screens use
+// these, and App paints the current one on the root <html> element so the
+// browser canvas — including the iOS safe-area strip below the app — matches the
+// screen instead of showing a dark bar.
+export const START_BG =
+  'linear-gradient(160deg, #FFC58C 0%, #F87A9A 52%, #B77BE0 100%)'
+export const SETUP_BG = 'linear-gradient(160deg, #FFE4C6 0%, #FFB9A2 100%)'
+export const TRANSITION_BG = 'linear-gradient(160deg, #1E1630 0%, #2E2142 100%)'
+export const END_BG =
+  'linear-gradient(160deg, #FFD3A6 0%, #F5849E 55%, #9E77DE 100%)'
+
+export function screenBackground(screen: Screen, depth: Depth): string {
+  switch (screen) {
+    case 'setup':
+      return SETUP_BG
+    case 'playing':
+      return depthBackground(depth)
+    case 'transition':
+      return TRANSITION_BG
+    case 'end':
+      return END_BG
+    default:
+      return START_BG
+  }
 }

@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useGame } from './game/useGame'
+import { screenBackground } from './game/theme'
 import { StartScreen } from './screens/StartScreen'
 import { SetupScreen } from './screens/SetupScreen'
 import { GameScreen } from './screens/GameScreen'
@@ -12,8 +14,19 @@ import { EndScreen } from './screens/EndScreen'
 function App() {
   const { state, spotlight, nextPlayer, actions } = useGame()
 
+  // Paint the current screen's gradient on the root <html> element. The root
+  // background is propagated across the whole browser canvas, so the iOS
+  // safe-area strip below the app matches the screen instead of showing a dark
+  // bar. The screens keep their own gradient on top for cross-fade transitions.
+  useEffect(() => {
+    document.documentElement.style.background = screenBackground(
+      state.screen,
+      state.depth,
+    )
+  }, [state.screen, state.depth])
+
   return (
-    <div className="app-surface relative h-full overflow-hidden bg-[#14101a]">
+    <div className="app-surface relative h-full overflow-hidden">
       <AnimatePresence mode="wait">
         {state.screen === 'start' && (
           <StartScreen key="start" onNewGame={actions.openSetup} />

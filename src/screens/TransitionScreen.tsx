@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import type { TurnAction } from '../game/types'
+import { TRANSITION_BG } from '../game/theme'
 import { useHaptics } from '../hooks/useHaptics'
 
 // The hand-off. Appears after EVERY action to (a) show where the conversation is
@@ -19,7 +20,6 @@ interface TransitionScreenProps {
 }
 
 const DWELL_MS = 900
-const BACKGROUND = 'linear-gradient(160deg, #1E1630 0%, #2E2142 100%)'
 
 function actionLabel(action: TurnAction | null): string {
   switch (action) {
@@ -100,7 +100,7 @@ export function TransitionScreen({
   return (
     <motion.div
       className="absolute inset-0 flex flex-col"
-      style={{ background: BACKGROUND }}
+      style={{ background: TRANSITION_BG }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

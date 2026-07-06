@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import type { Depth, Player } from '../game/types'
 import { DEPTHS } from '../game/types'
-import { DEPTH_THEME } from '../game/theme'
+import { DEPTH_THEME, SETUP_BG } from '../game/theme'
 import { FRIENDSHIP } from '../game/cards'
 
 // Setup is allowed to have inputs — it's not gameplay. Kept light and chip-based
@@ -41,9 +41,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
   return (
     <motion.div
       className="absolute inset-0 flex flex-col"
-      style={{
-        background: 'linear-gradient(160deg, #FFE4C6 0%, #FFB9A2 100%)',
-      }}
+      style={{ background: SETUP_BG }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

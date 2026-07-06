@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { START_BG } from '../game/theme'
 
 // First impression. Strong, warm, minimal — one clear way in.
 
@@ -10,10 +11,7 @@ export function StartScreen({ onNewGame }: StartScreenProps) {
   return (
     <motion.div
       className="absolute inset-0 flex flex-col"
-      style={{
-        background:
-          'linear-gradient(160deg, #FFC58C 0%, #F87A9A 52%, #B77BE0 100%)',
-      }}
+      style={{ background: START_BG }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
