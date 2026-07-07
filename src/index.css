@@ -38,7 +38,7 @@ body {
 }
 
 #root {
-  min-height: 100dvh;
+  min-height: 100vh;
   isolation: isolate;
 }
 
@@ -71,7 +71,7 @@ body {
   width: 100%;
   max-width: 480px;
   margin-inline: auto;
-  min-height: 100dvh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   position: relative;
