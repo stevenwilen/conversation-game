@@ -4,12 +4,13 @@ import type { PanInfo } from 'framer-motion'
 import { useHaptics } from '../hooks/useHaptics'
 
 // The card is the hero object. It is handled, not clicked:
-//   tap          -> answer / complete the turn
+//   quick tap    -> answer / complete the turn
 //   swipe left   -> lighter   (blocked at Depth 1 — the card won't drag there)
 //   swipe right  -> deeper    (blocked at Depth 5 — the card won't drag there)
 //
-// A committed swipe must never also register as a tap, or the turn would be
-// mislabelled "Answered". `committedRef` guards against that.
+// A committed swipe must never also register as a tap (`committedRef` guards
+// that), and a press held longer than TAP_MAX_MS isn't a tap either — so you can
+// rest a finger on the card without ending the turn.
 
 interface CardProps {
   text: string
@@ -25,6 +26,8 @@ interface CardProps {
 
 const SWIPE_DISTANCE = 90
 const SWIPE_VELOCITY = 480
+// A press held longer than this counts as a hold, not a tap.
+const TAP_MAX_MS = 1000
 
 // Prompt-length-aware typography (P6). Short prompts stay big and punchy; long
 // ones step down so they still breathe on a small iPhone.
@@ -51,6 +54,7 @@ export function Card({
   const x = useMotionValue(0)
   const rotate = useTransform(x, [-220, 220], [-9, 9])
   const committedRef = useRef(false)
+  const pressStartRef = useRef(0)
 
   // Gentle one-time wiggle implying "you can swipe me" (P3). Only wiggles toward
   // directions that are actually available at this depth.
@@ -97,6 +101,8 @@ export function Card({
       committedRef.current = false
       return
     }
+    // A press held longer than a second is a hold, not a tap — ignore it.
+    if (performance.now() - pressStartRef.current > TAP_MAX_MS) return
     onAnswer()
   }
 
@@ -129,6 +135,9 @@ export function Card({
         }}
         dragConstraints={{ left: 0, right: 0 }}
         onDragEnd={handleDragEnd}
+        onTapStart={() => {
+          pressStartRef.current = performance.now()
+        }}
         onTap={handleTap}
         whileTap={{ scale: 0.985 }}
         initial={{ opacity: 0, y: 26, scale: 0.9 }}
