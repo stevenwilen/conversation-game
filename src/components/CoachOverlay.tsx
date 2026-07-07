@@ -1,17 +1,17 @@
 import { motion } from 'framer-motion'
 
-// One-time, first-card teaching layer (P2). Purely instructional — it changes
-// no rules. Shown until the player dismisses it; a `seenCoach` flag in game
-// state (persisted to localStorage) keeps it from ever reappearing.
+// First-card teaching layer. Shown at the start of every game (a `seenCoach`
+// flag dismisses it for the rest of that game). Teaches the core rule: choose
+// before you speak — answer this card, or steer instead.
 
 interface CoachOverlayProps {
   onDismiss: () => void
 }
 
 const ROWS = [
-  { icon: '👆', title: 'Tap', desc: 'Answer, then pass' },
-  { icon: '←', title: 'Swipe left', desc: 'Go lighter' },
-  { icon: '→', title: 'Swipe right', desc: 'Go deeper' },
+  { icon: '👆', title: 'Tap the card', desc: 'claim it and answer' },
+  { icon: '⇄', title: 'Steer instead', desc: "don't answer — redirect" },
+  { icon: '↔', title: 'Then swipe', desc: '‹ lighter · deeper ›' },
 ]
 
 export function CoachOverlay({ onDismiss }: CoachOverlayProps) {
@@ -37,10 +37,13 @@ export function CoachOverlay({ onDismiss }: CoachOverlayProps) {
           How to play
         </div>
         <h2 className="mt-1 text-[25px] font-bold tracking-[-0.01em]">
-          It's a card in your hand
+          Choose before you speak
         </h2>
+        <p className="mt-1.5 text-[14px] font-medium leading-snug text-[var(--color-ink)]/55">
+          Read the card, then decide — answer it, or steer. You can't do both.
+        </p>
 
-        {/* Animated swipe demo */}
+        {/* Animated swipe demo (for the Steer step) */}
         <div className="relative my-5 h-24 overflow-hidden rounded-2xl bg-[var(--color-ink)]/5">
           <div className="absolute inset-y-0 left-3 flex items-center text-[11px] font-bold uppercase tracking-wider text-[var(--color-ink)]/35">
             lighter
