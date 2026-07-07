@@ -17,39 +17,28 @@
 /* ---- Base --------------------------------------------------------------- */
 html {
   height: 100%;
-  /* Dark base behind everything, so any overscroll strip that iOS reveals
-     matches the app frame instead of flashing white. */
+  /* Dark base; App also paints the current screen's gradient here, so any strip
+     the browser exposes (safe area / overscroll) matches instead of white. */
   background: #14101a;
-  overflow: hidden;
+  /* Soften the bounce, but the page is NOT pinned — it scrolls naturally. */
   overscroll-behavior: none;
 }
 
 body {
   margin: 0;
-  /* Lock the page to the viewport so iOS Safari can't rubber-band and reveal
-     blank space above/below the app. `position: fixed` is the key part: with no
-     scrollable document there is nothing to bounce. Scrolling only happens
-     inside the app's own containers (e.g. the setup list). */
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  overscroll-behavior: none;
   background: #14101a;
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
 }
 
 #root {
-  /* Pin the app to the visible viewport so iOS Safari can't reveal the page
-     background around it, and so page scroll can't push the toolbars around. */
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
+  min-height: 100dvh;
   isolation: isolate;
 }
 
@@ -82,7 +71,7 @@ body {
   width: 100%;
   max-width: 480px;
   margin-inline: auto;
-  height: 100%;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   position: relative;

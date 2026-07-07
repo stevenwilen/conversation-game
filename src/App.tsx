@@ -26,7 +26,7 @@ function App() {
   }, [state.screen, state.depth])
 
   return (
-    <div className="app-surface relative h-full overflow-hidden">
+    <div className="app-surface relative min-h-dvh overflow-hidden">
       <AnimatePresence mode="wait">
         {state.screen === 'start' && (
           <StartScreen key="start" onNewGame={actions.openSetup} />
