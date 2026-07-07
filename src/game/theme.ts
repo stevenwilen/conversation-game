@@ -75,7 +75,10 @@ export function depthBackground(depth: Depth): string {
 export const START_BG =
   'linear-gradient(160deg, #FFC58C 0%, #F87A9A 52%, #B77BE0 100%)'
 export const SETUP_BG = 'linear-gradient(160deg, #FFE4C6 0%, #FFB9A2 100%)'
-export const TRANSITION_BG = 'linear-gradient(160deg, #1E1630 0%, #2E2142 100%)'
+// Warm twilight for the hand-off. Lifted well off the near-black steer room so
+// "Answered / pass the phone" reads as a distinct, calmer beat rather than
+// another flat dark screen. Still deep enough for white text to sit cleanly.
+export const TRANSITION_BG = 'linear-gradient(160deg, #7A5A93 0%, #392A55 100%)'
 export const END_BG =
   'linear-gradient(160deg, #FFD3A6 0%, #F5849E 55%, #9E77DE 100%)'
 

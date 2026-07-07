@@ -41,7 +41,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
 
   return (
     <motion.div
-      className="absolute inset-0 flex flex-col"
+      className="absolute inset-0 overflow-y-auto overscroll-y-contain"
       style={{ background: SETUP_BG }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -64,8 +64,8 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
           <span className="w-14" />
         </div>
 
-        {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto overscroll-y-contain px-6 pb-4">
+        {/* Body — flows in the single page scroll (nothing pinned) */}
+        <div className="px-6 pb-4">
           <h1 className="mt-4 text-[34px] font-bold leading-tight tracking-[-0.01em]">
             Who's playing?
           </h1>
