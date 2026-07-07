@@ -1,9 +1,11 @@
-import type { Deck, Depth } from './types'
-import { friendshipCards } from '../data/friendship'
+import type { Deck, DeckId, Depth } from './types'
+import { socialCards } from '../data/social'
+import { familyCards } from '../data/family'
+import { debatesCards } from '../data/debates'
 
 // ---------------------------------------------------------------------------
-// Friendship deck — the only deck in the first prototype.
-// Content lives in src/data/friendship.ts (50 cards, 10 per depth). Here we
+// Social deck — the only deck in the first prototype.
+// Content lives in src/data/social.ts (50 cards, 10 per depth). Here we
 // group it into the runtime shape the game logic already uses (a string[] per
 // depth). Tone / topic / sensitivity live behind the scenes in the source
 // data; they never surface as player-facing controls.
@@ -11,20 +13,39 @@ import { friendshipCards } from '../data/friendship'
 
 function groupByDepth(): Record<Depth, string[]> {
   const grouped: Record<Depth, string[]> = { 1: [], 2: [], 3: [], 4: [], 5: [] }
-  for (const card of friendshipCards) {
+  for (const card of socialCards) {
     grouped[card.depth].push(card.text)
   }
   return grouped
 }
 
-export const FRIENDSHIP: Deck = {
-  id: 'friendship',
-  name: 'Friendship',
+export const SOCIAL: Deck = {
+  id: 'social',
+  name: 'Social',
   tagline: 'For the people who already know your worst jokes.',
   cards: groupByDepth(),
 }
 
-export const DECKS: Deck[] = [FRIENDSHIP]
+export const FAMILY: Deck = {
+  id: 'family',
+  name: 'Family',
+  tagline: 'Home, and everything that came with it.',
+  cards: familyCards,
+}
+
+export const DEBATE: Deck = {
+  id: 'debate',
+  name: 'Debate',
+  tagline: 'Pick a side. Defend it. Stay friends.',
+  cards: debatesCards,
+}
+
+export const DECKS: Deck[] = [SOCIAL, FAMILY, DEBATE]
+
+/** Look up a deck by id, falling back to the first deck. */
+export function deckById(id: DeckId): Deck {
+  return DECKS.find((deck) => deck.id === id) ?? SOCIAL
+}
 
 /** Per-depth queues of the remaining shuffled prompts for the current cycle. */
 export type DeckQueues = Record<Depth, string[]>

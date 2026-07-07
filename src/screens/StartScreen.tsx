@@ -65,7 +65,7 @@ export function StartScreen({ onNewGame }: StartScreenProps) {
             Start a game
           </motion.button>
           <p className="mt-4 text-center text-[13px] font-medium text-white/70">
-            Deck: Friendship · 2+ players
+            3 decks · 2+ players
           </p>
         </motion.div>
       </div>

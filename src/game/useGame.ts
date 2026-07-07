@@ -6,7 +6,7 @@ import type {
   Screen,
   TurnAction,
 } from './types'
-import { FRIENDSHIP, dealCard, emptyQueues } from './cards'
+import { dealCard, deckById, emptyQueues } from './cards'
 import type { DeckQueues } from './cards'
 
 // Single source of truth for the game. A tiny state machine over the five
@@ -43,7 +43,7 @@ const initialState: GameState = {
   screen: 'start',
   players: [],
   spotlightIndex: 0,
-  deck: 'friendship',
+  deck: 'social',
   depth: 1,
   card: '',
   lastAction: null,
@@ -54,7 +54,7 @@ const initialState: GameState = {
 
 type Action =
   | { type: 'OPEN_SETUP' }
-  | { type: 'START'; players: Player[]; depth: Depth }
+  | { type: 'START'; players: Player[]; depth: Depth; deck: DeckId }
   | { type: 'ACT'; action: TurnAction }
   | { type: 'CONTINUE' }
   | { type: 'UNDO' }
@@ -76,11 +76,12 @@ function reducer(state: GameState, action: Action): GameState {
       return { ...state, screen: 'setup' }
 
     case 'START': {
-      const dealt = dealCard(FRIENDSHIP, emptyQueues(), action.depth)
+      const dealt = dealCard(deckById(action.deck), emptyQueues(), action.depth)
       return {
         ...state,
         players: action.players,
         spotlightIndex: 0,
+        deck: action.deck,
         depth: action.depth,
         card: dealt.card,
         queues: dealt.queues,
@@ -108,7 +109,12 @@ function reducer(state: GameState, action: Action): GameState {
     case 'CONTINUE': {
       const count = state.players.length
       const nextIndex = count > 0 ? (state.spotlightIndex + 1) % count : 0
-      const dealt = dealCard(FRIENDSHIP, state.queues, state.depth, state.card)
+      const dealt = dealCard(
+        deckById(state.deck),
+        state.queues,
+        state.depth,
+        state.card,
+      )
       return {
         ...state,
         spotlightIndex: nextIndex,
@@ -135,7 +141,7 @@ function reducer(state: GameState, action: Action): GameState {
       return { ...state, screen: 'end' }
 
     case 'PLAY_AGAIN': {
-      const dealt = dealCard(FRIENDSHIP, emptyQueues(), 1)
+      const dealt = dealCard(deckById(state.deck), emptyQueues(), 1)
       return {
         ...state,
         spotlightIndex: 0,
@@ -180,7 +186,7 @@ function loadInitial(): GameState {
       (merged.screen === 'playing' || merged.screen === 'transition') &&
       !merged.card
     ) {
-      const dealt = dealCard(FRIENDSHIP, merged.queues, merged.depth)
+      const dealt = dealCard(deckById(merged.deck), merged.queues, merged.depth)
       merged.card = dealt.card
       merged.queues = dealt.queues
     }
@@ -210,8 +216,8 @@ export function useGame() {
   const actions = useMemo(
     () => ({
       openSetup: () => dispatch({ type: 'OPEN_SETUP' }),
-      start: (players: Player[], depth: Depth) =>
-        dispatch({ type: 'START', players, depth }),
+      start: (players: Player[], depth: Depth, deck: DeckId) =>
+        dispatch({ type: 'START', players, depth, deck }),
       act: (turnAction: TurnAction) =>
         dispatch({ type: 'ACT', action: turnAction }),
       continueTurn: () => dispatch({ type: 'CONTINUE' }),
@@ -225,5 +231,7 @@ export function useGame() {
     [],
   )
 
-  return { state, spotlight, nextPlayer, actions }
+  const deckName = deckById(state.deck).name
+
+  return { state, spotlight, nextPlayer, deckName, actions }
 }

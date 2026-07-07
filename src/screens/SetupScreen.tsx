@@ -1,23 +1,24 @@
 import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import type { Depth, Player } from '../game/types'
+import type { Depth, DeckId, Player } from '../game/types'
 import { DEPTHS } from '../game/types'
 import { DEPTH_THEME, SETUP_BG } from '../game/theme'
-import { FRIENDSHIP } from '../game/cards'
+import { DECKS } from '../game/cards'
 
 // Setup is allowed to have inputs — it's not gameplay. Kept light and chip-based
-// rather than form-like. Deck is locked to Friendship; Pivot is shown as
-// coming-soon because it stays disabled until multiple decks exist.
+// rather than form-like. The group picks one deck to play; in-game Pivot stays
+// disabled for now, so the deck is chosen here and holds for the whole game.
 
 interface SetupScreenProps {
   onBack: () => void
-  onStart: (players: Player[], startDepth: Depth) => void
+  onStart: (players: Player[], startDepth: Depth, deck: DeckId) => void
 }
 
 export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
   const [players, setPlayers] = useState<Player[]>([])
   const [name, setName] = useState('')
   const [startDepth, setStartDepth] = useState<Depth>(1)
+  const [deckId, setDeckId] = useState<DeckId>('social')
   const idRef = useRef(0)
 
   const canStart = players.length >= 2
@@ -128,21 +129,28 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
             <div className="text-[13px] font-semibold uppercase tracking-[0.16em] text-[var(--color-ink)]/45">
               Deck
             </div>
-            <div className="mt-2.5 flex gap-3">
-              <div className="flex-1 rounded-3xl bg-white/80 p-4 shadow-[0_10px_30px_-16px_rgba(20,16,26,0.5)] ring-2 ring-[var(--color-ink)]">
-                <div className="text-[19px] font-bold">{FRIENDSHIP.name}</div>
-                <div className="mt-1 text-[13px] font-medium leading-snug text-[var(--color-ink)]/55">
-                  {FRIENDSHIP.tagline}
-                </div>
-              </div>
-              <div className="flex w-24 flex-col items-center justify-center rounded-3xl border-2 border-dashed border-[var(--color-ink)]/20 p-3 text-center">
-                <div className="text-[13px] font-semibold text-[var(--color-ink)]/40">
-                  More soon
-                </div>
-                <div className="mt-1 text-[10px] font-medium leading-tight text-[var(--color-ink)]/35">
-                  Pivot unlocks with more decks
-                </div>
-              </div>
+            <div className="mt-2.5 flex flex-col gap-2.5">
+              {DECKS.map((deck) => {
+                const selected = deck.id === deckId
+                return (
+                  <motion.button
+                    key={deck.id}
+                    type="button"
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setDeckId(deck.id)}
+                    className={`rounded-3xl p-4 text-left transition ${
+                      selected
+                        ? 'bg-white/85 shadow-[0_10px_30px_-16px_rgba(20,16,26,0.5)] ring-2 ring-[var(--color-ink)]'
+                        : 'bg-white/55 ring-2 ring-transparent'
+                    }`}
+                  >
+                    <div className="text-[19px] font-bold">{deck.name}</div>
+                    <div className="mt-1 text-[13px] font-medium leading-snug text-[var(--color-ink)]/55">
+                      {deck.tagline}
+                    </div>
+                  </motion.button>
+                )
+              })}
             </div>
           </div>
 
@@ -184,7 +192,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
         <div className="px-6 pb-10 pt-3">
           <motion.button
             type="button"
-            onClick={() => onStart(players, startDepth)}
+            onClick={() => onStart(players, startDepth, deckId)}
             disabled={!canStart}
             whileTap={{ scale: canStart ? 0.96 : 1 }}
             className="w-full rounded-full bg-[var(--color-ink)] py-5 text-lg font-semibold text-white shadow-[0_18px_40px_-14px_rgba(20,16,26,0.55)] transition disabled:opacity-30"

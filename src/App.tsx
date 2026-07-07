@@ -12,7 +12,7 @@ import { EndScreen } from './screens/EndScreen'
 // cross-fades between them so the whole thing feels like one moving surface.
 
 function App() {
-  const { state, spotlight, nextPlayer, actions } = useGame()
+  const { state, spotlight, nextPlayer, deckName, actions } = useGame()
 
   // Paint the current screen's gradient on the root <html> element. The root
   // background is propagated across the whole browser canvas, so the iOS
@@ -41,6 +41,7 @@ function App() {
             key="playing"
             depth={state.depth}
             card={state.card}
+            topic={deckName}
             spotlightName={spotlight?.name ?? 'Player'}
             seenCoach={state.seenCoach}
             onAnswer={() => actions.act('answer')}
