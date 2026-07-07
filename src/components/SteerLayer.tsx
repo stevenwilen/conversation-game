@@ -21,7 +21,7 @@ interface SteerLayerProps {
 }
 
 const COMMIT = 110
-const textShadow = { textShadow: '0 1px 12px rgba(0,0,0,0.5)' }
+const textShadow = { textShadow: '0 1px 3px rgba(0,0,0,0.4)' }
 
 // Directional chevrons for a live option (« Lighter / Deeper »).
 function EdgeChevrons({ dir }: { dir: 'left' | 'right' }) {
@@ -40,7 +40,6 @@ function EdgeChevrons({ dir }: { dir: 'left' | 'right' }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden
-      style={{ filter: 'drop-shadow(0 1px 8px rgba(0,0,0,0.5))' }}
     >
       {paths.map((d) => (
         <path key={d} d={d} />
@@ -100,11 +99,9 @@ export function SteerLayer({ x, depth, canLighter, canDeeper }: SteerLayerProps)
   const deeper = canDeeper ? DEPTH_THEME[(depth + 1) as Depth] : null
   const current = DEPTH_THEME[depth]
 
-  // Zones are clearly visible at rest, brighten/swell toward, dim opposite.
+  // Zones are clearly visible at rest, brighten toward the drag, dim opposite.
   const lighterZone = useTransform(x, [-COMMIT, 0, COMMIT], [1, 0.85, 0.4])
   const deeperZone = useTransform(x, [-COMMIT, 0, COMMIT], [0.4, 0.85, 1])
-  const lighterScale = useTransform(x, [-COMMIT, 0, COMMIT], [1.12, 1, 0.94])
-  const deeperScale = useTransform(x, [-COMMIT, 0, COMMIT], [0.94, 1, 1.12])
 
   return (
     <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
@@ -114,10 +111,7 @@ export function SteerLayer({ x, depth, canLighter, canDeeper }: SteerLayerProps)
           className="absolute inset-y-0 left-0 flex items-center"
           style={{ opacity: lighterZone }}
         >
-          <motion.div
-            className="flex flex-col items-center gap-1.5 px-4 text-white"
-            style={{ scale: lighterScale }}
-          >
+          <div className="flex flex-col items-center gap-1.5 px-4 text-white">
             <EdgeChevrons dir="left" />
             <div className="text-[16px] font-extrabold uppercase tracking-[0.14em]" style={textShadow}>
               Lighter
@@ -125,7 +119,7 @@ export function SteerLayer({ x, depth, canLighter, canDeeper }: SteerLayerProps)
             <div className="text-[12px] font-semibold text-white/85" style={textShadow}>
               {lighter.label}
             </div>
-          </motion.div>
+          </div>
         </motion.div>
       ) : (
         <LimitZone dir="left" label={current.label} />
@@ -137,10 +131,7 @@ export function SteerLayer({ x, depth, canLighter, canDeeper }: SteerLayerProps)
           className="absolute inset-y-0 right-0 flex items-center"
           style={{ opacity: deeperZone }}
         >
-          <motion.div
-            className="flex flex-col items-center gap-1.5 px-4 text-white"
-            style={{ scale: deeperScale }}
-          >
+          <div className="flex flex-col items-center gap-1.5 px-4 text-white">
             <EdgeChevrons dir="right" />
             <div className="text-[16px] font-extrabold uppercase tracking-[0.14em]" style={textShadow}>
               Deeper
@@ -148,7 +139,7 @@ export function SteerLayer({ x, depth, canLighter, canDeeper }: SteerLayerProps)
             <div className="text-[12px] font-semibold text-white/85" style={textShadow}>
               {deeper.label}
             </div>
-          </motion.div>
+          </div>
         </motion.div>
       ) : (
         <LimitZone dir="right" label={current.label} />

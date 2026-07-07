@@ -21,7 +21,7 @@ function groupByDepth(): Record<Depth, string[]> {
 
 export const SOCIAL: Deck = {
   id: 'social',
-  name: 'Social',
+  name: 'Social Life',
   tagline: 'For the people who already know your worst jokes.',
   cards: groupByDepth(),
 }

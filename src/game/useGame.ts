@@ -35,6 +35,8 @@ export interface GameState {
   seenCoach: boolean
   /** Depth before the pending action, so the transition can be undone. */
   prevDepth: Depth | null
+  /** Deck before a pending pivot, so the transition can be undone. */
+  prevDeck: DeckId | null
   /** Remaining shuffled prompts per depth, so questions don't repeat early. */
   queues: DeckQueues
 }
@@ -49,6 +51,7 @@ const initialState: GameState = {
   lastAction: null,
   seenCoach: false,
   prevDepth: null,
+  prevDeck: null,
   queues: emptyQueues(),
 }
 
@@ -56,11 +59,9 @@ type Action =
   | { type: 'OPEN_SETUP' }
   | { type: 'START'; players: Player[]; depth: Depth; deck: DeckId }
   | { type: 'ACT'; action: TurnAction }
+  | { type: 'PIVOT'; deck: DeckId }
   | { type: 'CONTINUE' }
   | { type: 'UNDO' }
-  | { type: 'END' }
-  | { type: 'PLAY_AGAIN' }
-  | { type: 'NEW_GAME' }
   | { type: 'DISMISS_COACH' }
   | { type: 'QUIT' }
 
@@ -101,10 +102,26 @@ function reducer(state: GameState, action: Action): GameState {
         ...state,
         depth,
         prevDepth: state.depth,
+        prevDeck: state.deck,
         lastAction: action.action,
         screen: 'transition',
       }
     }
+
+    case 'PIVOT':
+      // Switch to another deck but keep the current depth. Like steering, it's
+      // not answering — it sets up the new topic and passes to the next player.
+      // Reset the queues so the next card is drawn fresh from the new deck, not
+      // from the old deck's leftover shuffle.
+      return {
+        ...state,
+        deck: action.deck,
+        queues: emptyQueues(),
+        prevDepth: state.depth,
+        prevDeck: state.deck,
+        lastAction: 'pivot',
+        screen: 'transition',
+      }
 
     case 'CONTINUE': {
       const count = state.players.length
@@ -122,42 +139,23 @@ function reducer(state: GameState, action: Action): GameState {
         queues: dealt.queues,
         lastAction: null,
         prevDepth: null,
+        prevDeck: null,
         screen: 'playing',
       }
     }
 
     case 'UNDO':
       // Revert an accidental action and return to the same card / same player,
-      // restoring the depth from before the action.
+      // restoring the depth and deck from before the action.
       return {
         ...state,
         depth: state.prevDepth ?? state.depth,
+        deck: state.prevDeck ?? state.deck,
         lastAction: null,
         prevDepth: null,
+        prevDeck: null,
         screen: 'playing',
       }
-
-    case 'END':
-      return { ...state, screen: 'end' }
-
-    case 'PLAY_AGAIN': {
-      const dealt = dealCard(deckById(state.deck), emptyQueues(), 1)
-      return {
-        ...state,
-        spotlightIndex: 0,
-        depth: 1,
-        card: dealt.card,
-        queues: dealt.queues,
-        // Fresh game — show the coach again and reshuffle.
-        seenCoach: false,
-        lastAction: null,
-        prevDepth: null,
-        screen: 'playing',
-      }
-    }
-
-    case 'NEW_GAME':
-      return { ...state, screen: 'setup' }
 
     case 'DISMISS_COACH':
       return { ...state, seenCoach: true }
@@ -220,11 +218,9 @@ export function useGame() {
         dispatch({ type: 'START', players, depth, deck }),
       act: (turnAction: TurnAction) =>
         dispatch({ type: 'ACT', action: turnAction }),
+      pivot: (deck: DeckId) => dispatch({ type: 'PIVOT', deck }),
       continueTurn: () => dispatch({ type: 'CONTINUE' }),
       undo: () => dispatch({ type: 'UNDO' }),
-      end: () => dispatch({ type: 'END' }),
-      playAgain: () => dispatch({ type: 'PLAY_AGAIN' }),
-      newGame: () => dispatch({ type: 'NEW_GAME' }),
       dismissCoach: () => dispatch({ type: 'DISMISS_COACH' }),
       quit: () => dispatch({ type: 'QUIT' }),
     }),

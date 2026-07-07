@@ -6,7 +6,6 @@ import { StartScreen } from './screens/StartScreen'
 import { SetupScreen } from './screens/SetupScreen'
 import { GameScreen } from './screens/GameScreen'
 import { TransitionScreen } from './screens/TransitionScreen'
-import { EndScreen } from './screens/EndScreen'
 
 // Screen router + state. One screen is visible at a time; AnimatePresence
 // cross-fades between them so the whole thing feels like one moving surface.
@@ -42,12 +41,14 @@ function App() {
             depth={state.depth}
             card={state.card}
             topic={deckName}
+            deckId={state.deck}
             spotlightName={spotlight?.name ?? 'Player'}
             seenCoach={state.seenCoach}
             onAnswer={() => actions.act('answer')}
             onLighter={() => actions.act('lighter')}
             onDeeper={() => actions.act('deeper')}
-            onEnd={actions.end}
+            onPivot={actions.pivot}
+            onEnd={actions.quit}
             onDismissCoach={actions.dismissCoach}
           />
         )}
@@ -59,15 +60,6 @@ function App() {
             action={state.lastAction}
             onContinue={actions.continueTurn}
             onUndo={actions.undo}
-          />
-        )}
-
-        {state.screen === 'end' && (
-          <EndScreen
-            key="end"
-            onPlayAgain={actions.playAgain}
-            onNewPlayers={actions.newGame}
-            onHome={actions.quit}
           />
         )}
       </AnimatePresence>

@@ -69,7 +69,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
           <h1 className="mt-4 text-[34px] font-bold leading-tight tracking-[-0.01em]">
             Who's playing?
           </h1>
-          <p className="mt-1.5 text-[15px] font-medium text-[var(--color-ink)]/55">
+          <p className="mt-1.5 text-balance text-[15px] font-medium text-[var(--color-ink)]/55">
             Everyone sharing the phone. Add at least two.
           </p>
 
@@ -140,12 +140,12 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
                     onClick={() => setDeckId(deck.id)}
                     className={`rounded-3xl p-4 text-left transition ${
                       selected
-                        ? 'bg-white/85 shadow-[0_10px_30px_-16px_rgba(20,16,26,0.5)] ring-2 ring-[var(--color-ink)]'
+                        ? 'bg-white/85 shadow-[0_4px_12px_rgba(20,16,26,0.14)] ring-2 ring-[var(--color-ink)]'
                         : 'bg-white/55 ring-2 ring-transparent'
                     }`}
                   >
                     <div className="text-[19px] font-bold">{deck.name}</div>
-                    <div className="mt-1 text-[13px] font-medium leading-snug text-[var(--color-ink)]/55">
+                    <div className="mt-1 text-balance text-[13px] font-medium leading-snug text-[var(--color-ink)]/55">
                       {deck.tagline}
                     </div>
                   </motion.button>
@@ -179,11 +179,11 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
                 )
               })}
             </div>
-            <div className="mt-2 text-[14px] font-medium text-[var(--color-ink)]/55">
+            <div className="mt-2 text-balance text-[14px] font-medium text-[var(--color-ink)]/55">
               <span className="font-bold text-[var(--color-ink)]/75">
-                {depthTheme.label}
+                {depthTheme.label}.
               </span>{' '}
-              — {depthTheme.blurb}
+              {depthTheme.blurb}
             </div>
           </div>
 
@@ -193,7 +193,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
             onClick={() => onStart(players, startDepth, deckId)}
             disabled={!canStart}
             whileTap={{ scale: canStart ? 0.96 : 1 }}
-            className="mt-8 mb-10 w-full rounded-full bg-[var(--color-ink)] py-5 text-lg font-semibold text-white shadow-[0_18px_40px_-14px_rgba(20,16,26,0.55)] transition disabled:opacity-30"
+            className="mt-8 mb-10 w-full rounded-full bg-[var(--color-ink)] py-5 text-lg font-semibold text-white shadow-[0_6px_16px_rgba(20,16,26,0.28)] transition disabled:opacity-30"
           >
             {canStart ? 'Start game' : 'Add 2+ players'}
           </motion.button>

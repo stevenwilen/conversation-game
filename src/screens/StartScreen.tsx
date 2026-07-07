@@ -25,28 +25,18 @@ export function StartScreen({ onNewGame }: StartScreenProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div
-              className="text-[15px] font-semibold uppercase tracking-[0.3em] text-white/80"
-              style={{ textShadow: '0 1px 16px rgba(0,0,0,0.18)' }}
-            >
-              Game V1.0
+            <div className="text-[15px] font-semibold uppercase tracking-[0.3em] text-white/80">
+              LEVELS
             </div>
-            <h1
-              className="mt-6 text-[52px] font-bold leading-[1.03] tracking-[-0.02em]"
-              style={{ textShadow: '0 2px 26px rgba(0,0,0,0.16)' }}
-            >
+            <h1 className="mt-6 text-[52px] font-bold leading-[1.03] tracking-[-0.02em]">
               Choose the
               <br />
               conversation
               <br />
               you want.
             </h1>
-            <p
-              className="mt-6 max-w-[19rem] text-[17px] font-medium leading-snug text-white/85"
-              style={{ textShadow: '0 1px 16px rgba(0,0,0,0.14)' }}
-            >
-              One phone, passed around. Go light, go deep, or steer — without
-              anyone being put on the spot.
+            <p className="mt-6 max-w-[19rem] text-balance text-[17px] font-medium leading-snug text-white/85">
+              One phone, passed around. No one gets put on the spot.
             </p>
           </motion.div>
         </div>
@@ -60,7 +50,7 @@ export function StartScreen({ onNewGame }: StartScreenProps) {
             type="button"
             onClick={onNewGame}
             whileTap={{ scale: 0.96 }}
-            className="w-full rounded-full bg-[var(--color-ink)] py-5 text-lg font-semibold text-white shadow-[0_18px_40px_-12px_rgba(20,16,26,0.55)]"
+            className="w-full rounded-full bg-[var(--color-ink)] py-5 text-lg font-semibold text-white shadow-[0_6px_16px_rgba(20,16,26,0.28)]"
           >
             Start a game
           </motion.button>

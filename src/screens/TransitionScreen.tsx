@@ -4,13 +4,9 @@ import type { TurnAction } from '../game/types'
 import { TRANSITION_BG } from '../game/theme'
 import { useHaptics } from '../hooks/useHaptics'
 
-// The hand-off. Appears after EVERY action to (a) show where the conversation is
-// heading and move the spotlight clearly to the next player, and (b) pace the
-// game — the next card can't be revealed until a short dwell passes and the
-// phone is deliberately tapped. "Go back" undoes an accidental action.
-//
-// Every hand-off shares one purple background; a single drifting icon carries
-// the direction instead of colour.
+// The hand-off. Appears after every action to move the spotlight to the next
+// player and pace the game — the next card can't be revealed until a short dwell
+// passes and the phone is tapped. "Go back" undoes an accidental action.
 
 interface TransitionScreenProps {
   nextPlayerName: string
@@ -24,19 +20,20 @@ const DWELL_MS = 900
 function actionLabel(action: TurnAction | null): string {
   switch (action) {
     case 'lighter':
-      return 'Going lighter…'
+      return 'Going lighter'
     case 'deeper':
-      return 'Going deeper…'
+      return 'Going deeper'
     case 'answer':
       return 'Answered'
+    case 'pivot':
+      return 'New topic'
     default:
       return 'Nice'
   }
 }
 
-// Chevrons descending for deeper, rising for lighter, a check for a plain answer
-// (staying at the same depth). The chevrons drift in their direction so you can
-// feel where the game is heading.
+// A static direction icon: chevrons down for deeper, up for lighter, a check for
+// a plain answer at the same depth.
 function ActionIcon({ action }: { action: TurnAction | null }) {
   const svg = {
     width: 34,
@@ -48,33 +45,36 @@ function ActionIcon({ action }: { action: TurnAction | null }) {
     strokeLinecap: 'round' as const,
     strokeLinejoin: 'round' as const,
   }
-  const drift = { duration: 1.7, repeat: Infinity, ease: 'easeInOut' as const }
-
   if (action === 'deeper') {
     return (
-      <motion.svg {...svg} animate={{ y: [0, 4, 0] }} transition={drift}>
+      <svg {...svg}>
         <path d="M7 7l5 5 5-5" />
         <path d="M7 13l5 5 5-5" />
-      </motion.svg>
+      </svg>
     )
   }
   if (action === 'lighter') {
     return (
-      <motion.svg {...svg} animate={{ y: [0, -4, 0] }} transition={drift}>
+      <svg {...svg}>
         <path d="M7 12l5-5 5 5" />
         <path d="M7 18l5-5 5 5" />
-      </motion.svg>
+      </svg>
+    )
+  }
+  if (action === 'pivot') {
+    return (
+      <svg {...svg}>
+        <path d="M17 2l4 4-4 4" />
+        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+        <path d="M7 22l-4-4 4-4" />
+        <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+      </svg>
     )
   }
   return (
-    <motion.svg
-      {...svg}
-      initial={{ scale: 0.5, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 320, damping: 18 }}
-    >
+    <svg {...svg}>
       <path d="M5 13l4 4 10-11" />
-    </motion.svg>
+    </svg>
   )
 }
 
@@ -92,7 +92,7 @@ export function TransitionScreen({
     return () => window.clearTimeout(timer)
   }, [])
 
-  // A little buzz as the phone is handed over (P5).
+  // A little buzz as the phone is handed over.
   useEffect(() => {
     haptic('pass')
   }, [haptic])
@@ -104,81 +104,54 @@ export function TransitionScreen({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.22 }}
+      transition={{ duration: 0.2 }}
       onClick={() => {
         if (ready) onContinue()
       }}
     >
-      <div
-        className="phone-frame text-white"
-        style={{ textShadow: '0 1px 12px rgba(0,0,0,0.28)' }}
-      >
+      <div className="phone-frame text-white">
         {/* Go back — undo an accidental tap/swipe. Available immediately, and
             stops the tap from also continuing to the next player. */}
         <div className="flex px-4 pt-4">
-          <motion.button
+          <button
             type="button"
             onClick={(event) => {
               event.stopPropagation()
               onUndo()
             }}
-            whileTap={{ scale: 0.95 }}
-            className="rounded-full bg-white/12 px-4 py-2 text-[14px] font-semibold text-white/85 backdrop-blur-sm"
+            className="rounded-full bg-white/12 px-4 py-2 text-[14px] font-semibold text-white/85"
           >
             ‹ Go back
-          </motion.button>
+          </button>
         </div>
 
         {/* Centered hand-off */}
         <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-          {/* Direction */}
-          <motion.div
-            className="flex h-[74px] w-[74px] items-center justify-center rounded-full border border-white/15 bg-white/10 text-white"
-            initial={{ opacity: 0, scale: 0.7 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: 'spring', stiffness: 240, damping: 18 }}
-          >
+          <div className="flex h-[74px] w-[74px] items-center justify-center rounded-full border border-white/15 bg-white/10 text-white">
             <ActionIcon action={action} />
-          </motion.div>
+          </div>
 
-          {/* What just happened */}
-          <motion.div
-            className="mt-5 text-[22px] font-semibold tracking-[-0.01em] text-white/90"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.06, duration: 0.4 }}
-          >
+          <div className="mt-5 text-[22px] font-semibold tracking-[-0.01em] text-white/90">
             {actionLabel(action)}
-          </motion.div>
+          </div>
 
-          {/* Who's next */}
-          <motion.div
-            className="mt-8"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12, duration: 0.45 }}
-          >
+          <div className="mt-8">
             <div className="text-[15px] font-medium text-white/55">
               Pass the phone to
             </div>
-            <div className="mt-1 text-[34px] font-bold leading-tight tracking-[-0.01em]">
+            <div className="mt-1 text-balance text-[34px] font-bold leading-tight tracking-[-0.01em]">
               {nextPlayerName}
             </div>
-          </motion.div>
+          </div>
 
-          <div className="mt-10 h-6">
+          <div className="mt-10 flex h-6 items-center justify-center">
             {ready ? (
-              <motion.div
-                className="text-[14px] font-semibold text-white/80"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 1.6, repeat: Infinity }}
-              >
+              <span className="text-[14px] font-semibold text-white/70">
                 Tap anywhere to continue
-              </motion.div>
+              </span>
             ) : (
-              <motion.div
-                className="mx-auto h-1.5 w-24 overflow-hidden rounded-full bg-white/15"
+              <div
+                className="h-1.5 w-24 overflow-hidden rounded-full bg-white/15"
                 aria-hidden
               >
                 <motion.div
@@ -187,7 +160,7 @@ export function TransitionScreen({
                   animate={{ width: '100%' }}
                   transition={{ duration: DWELL_MS / 1000, ease: 'linear' }}
                 />
-              </motion.div>
+              </div>
             )}
           </div>
         </div>

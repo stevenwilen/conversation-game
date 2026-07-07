@@ -154,18 +154,30 @@ Avoid:
 
 ## Visual Direction
 
+This is a PROTOTYPE for playtesting on a phone before printing physical cards.
+It should look clean and readable, not like a finished App Store product. Favor
+a flat, simple, slightly-playful prototype look over heavy polish.
+
 The design should feel:
 
-- premium
 - social
 - warm
+- clean
 - slightly playful
-- modern
 - mobile-native
 
-Use strong spacing, rounded cards, subtle shadows, soft gradients, and smooth motion.
+Use:
 
-Do not make it look corporate.
+- solid flat colors (one color per depth), NOT gradients
+- rounded cards and generous spacing
+- minimal, flat shadows (or none) — no soft glows
+- restrained motion — simple fades over springs, no looping/pulsing flourishes
+
+Depth is still color-coded (a functional cue), just with solid colors.
+
+Do not make it look corporate, and do not over-polish it back into a
+finished-app aesthetic (no gradients, glows, stacked-card flourishes, or
+decorative animation) unless explicitly asked.
 
 ## Technical Direction
 

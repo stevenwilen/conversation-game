@@ -9,7 +9,6 @@ interface CardSurfaceProps {
   /** Deck name shown as the corner tag. */
   topic: string
   accent: string
-  glow: string
   footer?: ReactNode
 }
 
@@ -21,13 +20,10 @@ function promptClass(length: number): string {
   return 'text-[19px] leading-[1.34] text-pretty'
 }
 
-export function CardSurface({ text, topic, accent, glow, footer }: CardSurfaceProps) {
+export function CardSurface({ text, topic, accent, footer }: CardSurfaceProps) {
   return (
     <div
-      className="relative flex min-h-[58dvh] flex-col justify-between rounded-[var(--radius-card)] bg-[var(--color-cream)] px-7 pb-7 pt-6"
-      style={{
-        boxShadow: `0 26px 60px -22px ${glow}, 0 6px 18px rgba(20,16,26,0.12)`,
-      }}
+      className="relative flex min-h-[58dvh] flex-col justify-between rounded-[var(--radius-card)] bg-[var(--color-cream)] px-7 pb-7 pt-6 shadow-[0_4px_14px_rgba(20,16,26,0.12)]"
     >
       <div className="flex items-center">
         <span

@@ -10,47 +10,50 @@ interface CoachOverlayProps {
 
 const ROWS = [
   { icon: '👆', title: 'Tap the card', desc: 'to answer it' },
-  { icon: '⇄', title: 'Steer instead', desc: "don't answer — go lighter or deeper" },
+  { icon: '⇄', title: 'Steer instead', desc: 'to go lighter or deeper' },
 ]
 
 export function CoachOverlay({ onDismiss }: CoachOverlayProps) {
   return (
     <motion.div
       className="absolute inset-0 z-40 flex items-center justify-center px-6"
-      style={{ background: 'rgba(10,7,16,0.55)', backdropFilter: 'blur(6px)' }}
-      initial={{ opacity: 0 }}
+      style={{ background: '#141019' }}
+      // No separate enter-fade: the overlay rides the GameScreen's own entrance
+      // so it's present with the game instead of fading in a beat later. Still
+      // fades on exit when dismissed.
+      initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
       onClick={onDismiss}
     >
       <motion.div
-        className="w-full max-w-sm rounded-[28px] bg-[var(--color-cream)] p-6 text-[var(--color-ink)] shadow-2xl"
-        initial={{ opacity: 0, y: 26, scale: 0.93 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 18, scale: 0.96 }}
-        transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+        className="w-full max-w-sm rounded-[28px] bg-[var(--color-cream)] px-7 py-9 text-[var(--color-ink)] shadow-[0_10px_30px_-8px_rgba(20,16,26,0.3)]"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 12 }}
+        transition={{ duration: 0.22, ease: 'easeOut' }}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="text-[13px] font-semibold uppercase tracking-[0.2em] text-[var(--color-ink)]/45">
           How to play
         </div>
-        <h2 className="mt-1 text-[25px] font-bold tracking-[-0.01em]">
+        <h2 className="mt-2 text-balance text-[25px] font-bold tracking-[-0.01em]">
           Choose before you speak
         </h2>
-        <p className="mt-1.5 text-[14px] font-medium leading-snug text-[var(--color-ink)]/55">
-          Read the card, then decide — answer it, or steer. You can't do both.
+        <p className="mt-3 text-balance text-[14px] font-medium leading-snug text-[var(--color-ink)]/55">
+          Read the card, then choose: answer it or steer. Not both.
         </p>
 
-        <ul className="mt-5 flex flex-col gap-3">
+        <ul className="mt-9 flex flex-col gap-6">
           {ROWS.map((row) => (
-            <li key={row.title} className="flex items-center gap-3.5">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-ink)]/8 text-xl">
+            <li key={row.title} className="flex items-center gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--color-ink)]/8 text-xl">
                 {row.icon}
               </span>
-              <span className="text-[15px] leading-tight">
-                <span className="font-bold">{row.title}</span>
-                <span className="text-[var(--color-ink)]/55"> — {row.desc}</span>
+              <span className="text-pretty text-[15px] leading-tight">
+                <span className="font-bold">{row.title}</span>{' '}
+                <span className="text-[var(--color-ink)]/55">{row.desc}</span>
               </span>
             </li>
           ))}
@@ -60,7 +63,7 @@ export function CoachOverlay({ onDismiss }: CoachOverlayProps) {
           type="button"
           onClick={onDismiss}
           whileTap={{ scale: 0.96 }}
-          className="mt-6 w-full rounded-full bg-[var(--color-ink)] py-4 text-base font-semibold text-white"
+          className="mt-9 w-full rounded-full bg-[var(--color-ink)] py-4 text-base font-semibold text-white"
         >
           Got it
         </motion.button>

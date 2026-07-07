@@ -9,10 +9,10 @@ export const DEPTHS: Depth[] = [1, 2, 3, 4, 5]
 
 export type DeckId = 'social' | 'family' | 'debate'
 
-export type Screen = 'start' | 'setup' | 'playing' | 'transition' | 'end'
+export type Screen = 'start' | 'setup' | 'playing' | 'transition'
 
 /** What the spotlight player did with the card. */
-export type TurnAction = 'answer' | 'lighter' | 'deeper'
+export type TurnAction = 'answer' | 'lighter' | 'deeper' | 'pivot'
 
 export interface Player {
   id: string
