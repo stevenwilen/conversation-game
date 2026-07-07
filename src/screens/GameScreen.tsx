@@ -67,6 +67,12 @@ export function GameScreen({
 
   const x = useMotionValue(0)
   const rotate = useTransform(x, [-240, 240], [-11, 11])
+  // While steering, the card itself carries the depth color and bleeds toward
+  // the target depth as you drag — the dark room behind it stays put.
+  const cardLighterTint = useTransform(x, [-COMMIT, -8, 0], [1, 0, 0])
+  const cardDeeperTint = useTransform(x, [0, 8, COMMIT], [0, 0, 1])
+  const lighterBg = depthBackground((canLighter ? depth - 1 : depth) as Depth)
+  const deeperBg = depthBackground((canDeeper ? depth + 1 : depth) as Depth)
 
   useMotionValueEvent(x, 'change', (v) => {
     const next =
@@ -134,7 +140,22 @@ export function GameScreen({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Whole-screen steering bleed + edge zones, behind the HUD */}
+      {/* Dark "empty room" that fades in while steering, so the colored card
+          and the Lighter/Deeper options pop against it. */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(circle at 50% 42%, #1B1526 0%, #08060E 74%)',
+        }}
+        initial={false}
+        animate={{ opacity: steering ? 1 : 0 }}
+        transition={{ duration: 0.35 }}
+      />
+
+      {/* Lighter / Deeper options — rendered above the card (z-20) so they stay
+          completely visible even over it. */}
       {steering && (
         <SteerLayer
           x={x}
@@ -157,22 +178,11 @@ export function GameScreen({
           </button>
         </header>
 
-        {/* Spotlight / steer title */}
+        {/* Spotlight title (hidden while steering — the steer label moves down
+            next to the card so it doesn't sit way up under the HUD) */}
         <div className="flex h-7 items-center justify-center px-5 pt-3">
-          <AnimatePresence mode="wait">
-            {steering ? (
-              <motion.span
-                key="steertitle"
-                className="text-[15px] font-bold uppercase tracking-[0.16em] text-white/85"
-                style={{ textShadow: '0 1px 12px rgba(0,0,0,0.3)' }}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.2 }}
-              >
-                Steer the conversation
-              </motion.span>
-            ) : (
+          <AnimatePresence>
+            {!steering && (
               <motion.span
                 key="spotlight"
                 className="flex items-center gap-2"
@@ -199,7 +209,23 @@ export function GameScreen({
 
         {/* Stage */}
         <main className="relative flex flex-1 flex-col px-5 pb-8 pt-2">
-          <div className="flex flex-1 items-center justify-center">
+          <div className="flex flex-1 flex-col items-center justify-center gap-5">
+            {/* Steer title — sits right above the card, not up under the HUD */}
+            <AnimatePresence>
+              {steering && (
+                <motion.span
+                  key="steertitle"
+                  className="text-[15px] font-bold uppercase tracking-[0.16em] text-white/85"
+                  style={{ textShadow: '0 1px 12px rgba(0,0,0,0.3)' }}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  Steer the conversation
+                </motion.span>
+              )}
+            </AnimatePresence>
             <div className="relative w-full">
               {/* Stacked deck (fades away when steering) */}
               <motion.div
@@ -236,23 +262,48 @@ export function GameScreen({
                 onTap={handleTap}
                 whileTap={steering ? undefined : { scale: 0.985 }}
                 initial={{ opacity: 0, y: 26, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: steering ? 0.66 : 1 }}
+                animate={{
+                  opacity: steering ? 0.58 : 1,
+                  y: 0,
+                  scale: steering ? 0.66 : 1,
+                }}
                 transition={{ type: 'spring', stiffness: 300, damping: 26 }}
               >
-                <CardSurface
-                  text={card}
-                  topic={topic}
-                  accent={theme.accent}
-                  glow={theme.glow}
-                  blank={steering}
-                  footer={
-                    steering ? null : (
+                {steering ? (
+                  // Faded, color-shifting panel: it takes the depth color and
+                  // bleeds toward the target depth with the drag.
+                  <div
+                    className="relative flex min-h-[58dvh] items-center justify-center overflow-hidden rounded-[var(--radius-card)] px-7"
+                    style={{
+                      background: depthBackground(depth),
+                      boxShadow: `0 30px 90px -16px ${theme.glow}`,
+                    }}
+                  >
+                    <motion.div
+                      className="absolute inset-0"
+                      style={{ background: lighterBg, opacity: cardLighterTint }}
+                    />
+                    <motion.div
+                      className="absolute inset-0"
+                      style={{ background: deeperBg, opacity: cardDeeperTint }}
+                    />
+                    <span className="relative whitespace-nowrap text-[52px] font-bold uppercase leading-none tracking-[-0.03em] text-white/25">
+                      {topic}
+                    </span>
+                  </div>
+                ) : (
+                  <CardSurface
+                    text={card}
+                    topic={topic}
+                    accent={theme.accent}
+                    glow={theme.glow}
+                    footer={
                       <span className="text-[13px] font-medium text-[var(--color-ink)]/35">
                         Tap to answer
                       </span>
-                    )
-                  }
-                />
+                    }
+                  />
+                )}
               </motion.div>
             </div>
           </div>

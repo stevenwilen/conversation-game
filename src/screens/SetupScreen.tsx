@@ -186,16 +186,14 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
               — {depthTheme.blurb}
             </div>
           </div>
-        </div>
 
-        {/* Footer CTA */}
-        <div className="px-6 pb-10 pt-3">
+          {/* CTA — flows with the content, sits at the bottom without pinning */}
           <motion.button
             type="button"
             onClick={() => onStart(players, startDepth, deckId)}
             disabled={!canStart}
             whileTap={{ scale: canStart ? 0.96 : 1 }}
-            className="w-full rounded-full bg-[var(--color-ink)] py-5 text-lg font-semibold text-white shadow-[0_18px_40px_-14px_rgba(20,16,26,0.55)] transition disabled:opacity-30"
+            className="mt-8 mb-10 w-full rounded-full bg-[var(--color-ink)] py-5 text-lg font-semibold text-white shadow-[0_18px_40px_-14px_rgba(20,16,26,0.55)] transition disabled:opacity-30"
           >
             {canStart ? 'Start game' : 'Add 2+ players'}
           </motion.button>

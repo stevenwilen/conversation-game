@@ -1,12 +1,12 @@
 import { motion, useTransform } from 'framer-motion'
 import type { MotionValue } from 'framer-motion'
 import type { Depth } from '../game/types'
-import { DEPTH_THEME, depthBackground } from '../game/theme'
+import { DEPTH_THEME } from '../game/theme'
 
-// Full-screen steering visuals behind the HUD, all driven by the card's drag
-// `x`. Pulling left bleeds the WHOLE background toward the lighter depth and
-// lights the left (Lighter) zone; pulling right does the same for Deeper. The
-// zones are pronounced frosted panels at the edges — options, not decoration.
+// The Lighter / Deeper options for the steer screen. They sit ABOVE the faded,
+// color-shifting card so they stay completely visible over it, and react to the
+// card's drag `x`: the target zone brightens and swells while the opposite one
+// dims. The color bleed lives on the card itself now — here it's just options.
 
 interface SteerLayerProps {
   x: MotionValue<number>
@@ -16,7 +16,7 @@ interface SteerLayerProps {
 }
 
 const COMMIT = 110
-const textShadow = { textShadow: '0 1px 12px rgba(0,0,0,0.4)' }
+const textShadow = { textShadow: '0 1px 12px rgba(0,0,0,0.5)' }
 
 function EdgeChevrons({ dir }: { dir: 'left' | 'right' }) {
   const paths =
@@ -34,7 +34,7 @@ function EdgeChevrons({ dir }: { dir: 'left' | 'right' }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden
-      style={{ filter: 'drop-shadow(0 1px 8px rgba(0,0,0,0.4))' }}
+      style={{ filter: 'drop-shadow(0 1px 8px rgba(0,0,0,0.5))' }}
     >
       {paths.map((d) => (
         <path key={d} d={d} />
@@ -46,12 +46,7 @@ function EdgeChevrons({ dir }: { dir: 'left' | 'right' }) {
 export function SteerLayer({ x, depth, canLighter, canDeeper }: SteerLayerProps) {
   const lighter = canLighter ? DEPTH_THEME[(depth - 1) as Depth] : null
   const deeper = canDeeper ? DEPTH_THEME[(depth + 1) as Depth] : null
-  const lighterBg = depthBackground((canLighter ? depth - 1 : depth) as Depth)
-  const deeperBg = depthBackground((canDeeper ? depth + 1 : depth) as Depth)
 
-  // Whole-screen bleed toward the target depth.
-  const lighterTint = useTransform(x, [-COMMIT, -8, 0], [0.82, 0, 0])
-  const deeperTint = useTransform(x, [0, 8, COMMIT], [0, 0, 0.82])
   // Zones are clearly visible at rest, brighten/swell toward, dim opposite.
   const lighterZone = useTransform(x, [-COMMIT, 0, COMMIT], [1, 0.85, 0.4])
   const deeperZone = useTransform(x, [-COMMIT, 0, COMMIT], [0.4, 0.85, 1])
@@ -59,17 +54,7 @@ export function SteerLayer({ x, depth, canLighter, canDeeper }: SteerLayerProps)
   const deeperScale = useTransform(x, [-COMMIT, 0, COMMIT], [0.94, 1, 1.12])
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-      {/* Full-screen background bleed */}
-      <motion.div
-        className="absolute inset-0"
-        style={{ background: lighterBg, opacity: lighterTint }}
-      />
-      <motion.div
-        className="absolute inset-0"
-        style={{ background: deeperBg, opacity: deeperTint }}
-      />
-
+    <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
       {/* Lighter zone (left edge) */}
       {lighter && (
         <motion.div
