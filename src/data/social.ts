@@ -26,7 +26,7 @@ export const socialCards: SocialCard[] = [
   { id: 'social-1-10', deck: 'social', depth: 1, text: "What is more important for a good party: food, music, people, place, or activity?" },
 
   // Level 2 — Casual
-  { id: 'social-2-01', deck: 'social', depth: 2, text: "What’s the most random plan you’ve ended up at?" },
+  { id: 'social-2-01', deck: 'social', depth: 2, text: "What’s the most random place you’ve ended up at?" },
   { id: 'social-2-02', deck: 'social', depth: 2, text: "What’s a funny reason you almost canceled plans?" },
   { id: 'social-2-03', deck: 'social', depth: 2, text: "When did a plan turn into something completely different?" },
   { id: 'social-2-04', deck: 'social', depth: 2, text: "When did you think something would be awkward, but it turned out fine?" },

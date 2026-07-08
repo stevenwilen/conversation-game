@@ -41,7 +41,7 @@ interface GameScreenProps {
 const SWIPE_DISTANCE = 90
 const SWIPE_VELOCITY = 480
 // A press held longer than this counts as a hold, not a tap.
-const TAP_MAX_MS = 1000
+const TAP_MAX_MS = 500
 
 export function GameScreen({
   depth,
