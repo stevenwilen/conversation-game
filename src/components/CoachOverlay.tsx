@@ -1,16 +1,17 @@
 import { motion } from 'framer-motion'
 
 // First-card teaching layer. Shown at the start of every game (a `seenCoach`
-// flag dismisses it for the rest of that game). Teaches the core rule: choose
-// before you speak — answer this card, or steer instead.
+// flag dismisses it for the rest of that game). Teaches the core loop: answer
+// the card out loud if you want, then choose where the group goes next.
 
 interface CoachOverlayProps {
   onDismiss: () => void
 }
 
 const ROWS = [
-  { icon: '👆', title: 'Tap the card', desc: 'to answer it' },
-  { icon: '⇄', title: 'Swipe left or right', desc: 'to go lighter or deeper' },
+  { icon: '👆', title: 'Tap', desc: 'to stay at this level' },
+  { icon: '↔️', title: 'Swipe', desc: 'to go lighter or deeper' },
+  { icon: '🔁', title: 'Pivot', desc: 'to switch topics, if the group agrees' },
 ]
 
 export function CoachOverlay({ onDismiss }: CoachOverlayProps) {
@@ -39,10 +40,11 @@ export function CoachOverlay({ onDismiss }: CoachOverlayProps) {
           How to play
         </div>
         <h2 className="mt-2 text-balance text-[25px] font-bold tracking-[-0.01em]">
-          Choose before you speak
+          Answer, then choose
         </h2>
         <p className="mt-3 text-balance text-[14px] font-medium leading-snug text-[var(--color-ink)]/55">
-          Read the card, then choose: answer it or steer. Not both.
+          Answer the card out loud if you want. Then decide where the group goes
+          next.
         </p>
 
         <ul className="mt-9 flex flex-col gap-6">

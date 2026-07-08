@@ -16,12 +16,12 @@ import { CoachOverlay } from '../components/CoachOverlay'
 import { PivotOverlay } from '../components/PivotOverlay'
 import { useHaptics } from '../hooks/useHaptics'
 
-// The card is handled directly — no separate steer mode:
-//   tap         -> answer / complete the turn
+// Answering happens out loud; the card just sets up the next turn:
+//   tap         -> stay at this level (pass to the next player)
 //   swipe left  -> lighter (blocked at Depth 1 — the card won't drag there)
 //   swipe right -> deeper  (blocked at Depth 5 — the card won't drag there)
-// Pivoting to another topic is rare, so it lives in a small button below the
-// card rather than in your way during a normal turn.
+// Pivoting to another topic is rare and needs group agreement, so it lives in a
+// small button below the card rather than in your way during a normal turn.
 
 interface GameScreenProps {
   depth: Depth
@@ -30,7 +30,7 @@ interface GameScreenProps {
   deckId: DeckId
   spotlightName: string
   seenCoach: boolean
-  onAnswer: () => void
+  onStay: () => void
   onLighter: () => void
   onDeeper: () => void
   onPivot: (deck: DeckId) => void
@@ -50,7 +50,7 @@ export function GameScreen({
   deckId,
   spotlightName,
   seenCoach,
-  onAnswer,
+  onStay,
   onLighter,
   onDeeper,
   onPivot,
@@ -115,14 +115,14 @@ export function GameScreen({
   }
 
   function handleTap() {
-    // A committed swipe already handled this gesture — don't also answer.
+    // A committed swipe already handled this gesture — don't also stay.
     if (committedRef.current) {
       committedRef.current = false
       return
     }
-    // A press held longer than a second is a hold, not a tap — ignore it.
+    // A press held longer than the cutoff is a hold, not a tap — ignore it.
     if (performance.now() - pressStartRef.current > TAP_MAX_MS) return
-    onAnswer()
+    onStay()
   }
 
   return (
@@ -190,7 +190,7 @@ export function GameScreen({
                 accent={theme.accent}
                 footer={
                   <span className="text-[13px] font-medium text-[var(--color-ink)]/35">
-                    Tap to answer
+                    Answer, then choose below
                   </span>
                 }
               />
@@ -205,7 +205,7 @@ export function GameScreen({
             >
               <span style={{ opacity: canLighter ? 0.9 : 0.3 }}>‹ Lighter</span>
               <span className="text-white/35">·</span>
-              <span className="opacity-90">Tap</span>
+              <span className="opacity-90">Tap to stay</span>
               <span className="text-white/35">·</span>
               <span style={{ opacity: canDeeper ? 0.9 : 0.3 }}>Deeper ›</span>
             </div>

@@ -23,8 +23,8 @@ function actionLabel(action: TurnAction | null): string {
       return 'Going lighter'
     case 'deeper':
       return 'Going deeper'
-    case 'answer':
-      return 'Answered'
+    case 'stay':
+      return 'Same level'
     case 'pivot':
       return 'New topic'
     default:
@@ -33,7 +33,7 @@ function actionLabel(action: TurnAction | null): string {
 }
 
 // A static direction icon: chevrons down for deeper, up for lighter, a check for
-// a plain answer at the same depth.
+// staying at the same level.
 function ActionIcon({ action }: { action: TurnAction | null }) {
   const svg = {
     width: 34,
@@ -71,9 +71,10 @@ function ActionIcon({ action }: { action: TurnAction | null }) {
       </svg>
     )
   }
+  // Stay at the same level: a simple horizontal mark, no up or down.
   return (
     <svg {...svg}>
-      <path d="M5 13l4 4 10-11" />
+      <path d="M6 12h12" />
     </svg>
   )
 }

@@ -44,7 +44,7 @@ function App() {
             deckId={state.deck}
             spotlightName={spotlight?.name ?? 'Player'}
             seenCoach={state.seenCoach}
-            onAnswer={() => actions.act('answer')}
+            onStay={() => actions.act('stay')}
             onLighter={() => actions.act('lighter')}
             onDeeper={() => actions.act('deeper')}
             onPivot={actions.pivot}

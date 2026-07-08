@@ -11,8 +11,9 @@ export type DeckId = 'social' | 'growingup'
 
 export type Screen = 'start' | 'setup' | 'playing' | 'transition'
 
-/** What the spotlight player did with the card. */
-export type TurnAction = 'answer' | 'lighter' | 'deeper' | 'pivot'
+/** What the spotlight player did after the card. Answering is verbal; these are
+ * the direction choices that pass the turn. */
+export type TurnAction = 'stay' | 'lighter' | 'deeper' | 'pivot'
 
 export interface Player {
   id: string

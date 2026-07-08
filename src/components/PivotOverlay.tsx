@@ -46,7 +46,8 @@ export function PivotOverlay({
           Switch to another topic
         </h2>
         <p className="mt-3 text-balance text-[14px] font-medium leading-snug text-[var(--color-ink)]/55">
-          Whichever you pick, you stay at the same depth ({depthLabel}).
+          Pivot only if the group agrees. Whichever you pick, you stay at the
+          same depth ({depthLabel}).
         </p>
 
         <ul className="mt-7 flex flex-col gap-3">

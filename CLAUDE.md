@@ -30,11 +30,12 @@ Tone, topic, sensitivity, and question format can exist behind the scenes while 
 
 ## Prototype Scope
 
-The first prototype uses one deck:
+The prototype uses two decks:
 
-- Friendship
+- Social Life
+- Growing Up
 
-It has five depth levels:
+Each deck has five depth levels:
 
 - Depth 1
 - Depth 2
@@ -44,7 +45,8 @@ It has five depth levels:
 
 Each depth should support the same number of cards if possible.
 
-Pivot is disabled until multiple decks exist.
+Pivot is enabled (there are multiple decks): the group can switch topics at the
+current depth, if everyone agrees.
 
 ## Depth Levels
 
@@ -70,10 +72,15 @@ Depth moves one level at a time.
 The turn loop is:
 
 1. Spotlight player draws a card from the current deck and depth.
-2. They read the card.
-3. They choose what happens through gesture-based actions.
+2. They read the card and answer it out loud if they want to (answering is
+   verbal — there is no "answer" action in the app).
+3. They choose where the group goes next through gesture-based actions.
 4. The game shows a short transition for the next player.
 5. The spotlight rotates.
+
+Answering and choosing a direction are decoupled: you no longer decide "answer
+OR steer" per card. You answer if you want, then set the direction for the next
+player.
 
 ## Mobile Interaction Model
 
@@ -81,14 +88,13 @@ Do not use a screen full of action buttons during gameplay.
 
 The main game screen should feel gesture-based and mobile-native.
 
-Player actions:
+Player actions (chosen after answering):
 
-- Tap the card: answer the card, or complete the turn after the group answers, at the current depth
+- Tap the card: stay at the current level, and pass to the next player
 - Swipe left: go lighter
 - Swipe right: go deeper
-- Pivot: disabled until multiple decks exist
-
-Showing a card to the group is informal — the spotlight player can read it aloud or hand the phone around, then tap to continue. There is no separate "open to group" gesture: it produced the same result as a tap (complete the turn, same depth, pass the spotlight), so it was removed to keep the model simple.
+- Pivot (small button below the card): switch to another topic, at the same
+  depth, if the group agrees
 
 The game should not feel like a form with buttons. It should feel like a physical card being handled on a phone.
 
