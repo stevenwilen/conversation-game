@@ -7,7 +7,7 @@ export type Depth = 1 | 2 | 3 | 4 | 5
 
 export const DEPTHS: Depth[] = [1, 2, 3, 4, 5]
 
-export type DeckId = 'social' | 'growingup' | 'debate'
+export type DeckId = 'social' | 'growingup'
 
 export type Screen = 'start' | 'setup' | 'playing' | 'transition'
 
