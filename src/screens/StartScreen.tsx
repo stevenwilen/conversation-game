@@ -26,7 +26,7 @@ export function StartScreen({ onNewGame }: StartScreenProps) {
             transition={{ delay: 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="text-[15px] font-semibold uppercase tracking-[0.3em] text-white/80">
-              LEVELS
+              Levels
             </div>
             <h1 className="mt-6 text-[52px] font-bold leading-[1.03] tracking-[-0.02em]">
               Choose the

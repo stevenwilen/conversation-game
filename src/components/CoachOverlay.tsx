@@ -10,7 +10,7 @@ interface CoachOverlayProps {
 
 const ROWS = [
   { icon: '👆', title: 'Tap the card', desc: 'to answer it' },
-  { icon: '⇄', title: 'Steer instead', desc: 'to go lighter or deeper' },
+  { icon: '⇄', title: 'Swipe left or right', desc: 'to go lighter or deeper' },
 ]
 
 export function CoachOverlay({ onDismiss }: CoachOverlayProps) {

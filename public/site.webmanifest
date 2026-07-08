@@ -1,6 +1,6 @@
 {
-  "name": "LEVELS",
-  "short_name": "LEVELS",
+  "name": "Levels",
+  "short_name": "Levels",
   "description": "A one-phone conversation game.",
   "start_url": "/",
   "display": "standalone",
