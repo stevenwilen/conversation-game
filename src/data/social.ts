@@ -23,7 +23,7 @@ export const socialCards: SocialCard[] = [
   { id: 'social-1-07', deck: 'social', depth: 1, text: "What’s the best last minute plan?" },
   { id: 'social-1-08', deck: 'social', depth: 1, text: "What makes someone fun to be around?" },
   { id: 'social-1-09', deck: 'social', depth: 1, text: "What do people do in public that gives you secondhand embarrassment?" },
-  { id: 'social-1-10', deck: 'social', depth: 1, text: "What is more important for a good party: food, music, people, place, or activity?" },
+  { id: 'social-1-10', deck: 'social', depth: 1, text: "What ruins a party the fastest?" },
 
   // Level 2 — Casual
   { id: 'social-2-01', deck: 'social', depth: 2, text: "What’s the most random place you’ve ended up at?" },

@@ -190,7 +190,7 @@ export function GameScreen({
                 accent={theme.accent}
                 footer={
                   <span className="text-[13px] font-medium text-[var(--color-ink)]/35">
-                    Answer, then choose below
+                    Answer, then choose
                   </span>
                 }
               />
