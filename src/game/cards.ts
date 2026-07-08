@@ -1,6 +1,6 @@
 import type { Deck, DeckId, Depth } from './types'
 import { socialCards } from '../data/social'
-import { familyCards } from '../data/family'
+import { growingUpCards } from '../data/growingUp'
 import { debatesCards } from '../data/debates'
 
 // ---------------------------------------------------------------------------
@@ -26,11 +26,11 @@ export const SOCIAL: Deck = {
   cards: groupByDepth(),
 }
 
-export const FAMILY: Deck = {
-  id: 'family',
-  name: 'Family',
-  tagline: 'Home, and everything that came with it.',
-  cards: familyCards,
+export const GROWING_UP: Deck = {
+  id: 'growingup',
+  name: 'Growing Up',
+  tagline: 'Back when everything felt like a big deal.',
+  cards: growingUpCards,
 }
 
 export const DEBATE: Deck = {
@@ -40,7 +40,7 @@ export const DEBATE: Deck = {
   cards: debatesCards,
 }
 
-export const DECKS: Deck[] = [SOCIAL, FAMILY, DEBATE]
+export const DECKS: Deck[] = [SOCIAL, GROWING_UP, DEBATE]
 
 /** Look up a deck by id, falling back to the first deck. */
 export function deckById(id: DeckId): Deck {

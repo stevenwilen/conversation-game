@@ -1,0 +1,67 @@
+import type { Depth } from '../game/types'
+
+// Growing Up deck — 50 prompts, 10 per depth level. Verbatim from the source; do
+// not reword. Level N maps to depth N (surface → very deep).
+
+export const growingUpCards: Record<Depth, string[]> = {
+  1: [
+    "What’s something you did all the time?",
+    "Who bought the best snacks?",
+    "What rule at home didn’t make sense to you?",
+    "What did you think was a big deal?",
+    "What shows did you watch?",
+    "What made someone seem cool when you were younger?",
+    "What did you always ask your parents for?",
+    "What was the worst part about school?",
+    "What did your family do that other families didn’t?",
+    "What were the best weekend plans?",
+  ],
+  2: [
+    "What did you believe for way too long?",
+    "Did you ever beg for something and then barely use it?",
+    "Which chore did you hate the most?",
+    "How did you usually try to get out of trouble?",
+    "What did you think you were good at, even if you probably weren’t?",
+    "What small thing felt like the end of the world?",
+    "Who got you into the most trouble?",
+    "What was the dumbest thing you and your siblings or friends argued about?",
+    "What did your house always run out of?",
+    "What was your “I’m never speaking to you again” moment?",
+  ],
+  3: [
+    "What did you hide that wasn’t even that bad?",
+    "When did you think you were being sneaky, but probably weren’t?",
+    "What did you pretend to like because everyone else liked it?",
+    "Who did you copy the most?",
+    "What family story about you is not fully true?",
+    "What did you get blamed for that still wasn’t your fault?",
+    "What did you think was unfair?",
+    "Do you think you were more mature than others?",
+    "What did other kids have that you wanted badly?",
+    "What did you care about way more than you admitted?",
+  ],
+  4: [
+    "What did you get away with that people still don’t know?",
+    "What rule did you break because you thought it was stupid?",
+    "What did your family make a big deal about that you never understood?",
+    "What did people expect from you that got annoying?",
+    "What did people joke about that you didn’t actually find funny?",
+    "What does your family remember wrong?",
+    "When did you feel like nobody was taking you seriously?",
+    "What opinion did you keep to yourself?",
+    "What did you start noticing that everyone else ignored?",
+    "What did you learn to stop bringing up?",
+  ],
+  5: [
+    "Did you have a secret that would surprise everyone?",
+    "What did you only understand once you got older?",
+    "When did you feel like you had to keep something to yourself?",
+    "What do people still bring up that you wish they would let go?",
+    "What were you taught that you don’t agree with anymore?",
+    "When did you act like something was fine, even though it bothered you?",
+    "When did you feel like you were treated younger than you actually were?",
+    "What did your family probably never realize bothered you?",
+    "What does everyone in your family remember differently?",
+    "What part of growing up changed you the most?",
+  ],
+}

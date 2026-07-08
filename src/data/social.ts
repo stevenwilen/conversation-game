@@ -51,8 +51,8 @@ export const socialCards: SocialCard[] = [
 
   // Level 4 — Vulnerable
   { id: 'social-4-01', deck: 'social', depth: 4, text: "When have you felt like the backup option?" },
-  { id: 'social-4-02', deck: 'social', depth: 4, text: "When have you acted like you were fine, but you really weren’t?" },
-  { id: 'social-4-03', deck: 'social', depth: 4, text: "What makes you feel unwanted in a group?" },
+  { id: 'social-4-02', deck: 'social', depth: 4, text: "When have you realized a group was not as close as you thought?" },
+  { id: 'social-4-03', deck: 'social', depth: 4, text: "What makes a group feel fake?" },
   { id: 'social-4-04', deck: 'social', depth: 4, text: "When have you stayed around people longer than you should have?" },
   { id: 'social-4-05', deck: 'social', depth: 4, text: "What’s a weird social dynamic you notice but usually don’t mention?" },
   { id: 'social-4-06', deck: 'social', depth: 4, text: "When have you felt replaced by someone else?" },
@@ -67,7 +67,7 @@ export const socialCards: SocialCard[] = [
   { id: 'social-5-03', deck: 'social', depth: 5, text: "What rejection or exclusion do you still remember?" },
   { id: 'social-5-04', deck: 'social', depth: 5, text: "When were you the problem in a social situation?" },
   { id: 'social-5-05', deck: 'social', depth: 5, text: "What do you hope people don’t notice about you?" },
-  { id: 'social-5-06', deck: 'social', depth: 5, text: "When have you wanted to be included but felt embarrassed for wanting it?" },
+  { id: 'social-5-06', deck: 'social', depth: 5, text: "When did being around people make you feel worse?" },
   { id: 'social-5-07', deck: 'social', depth: 5, text: "When have you felt lonely even though you were around people?" },
   { id: 'social-5-08', deck: 'social', depth: 5, text: "What version of yourself socially have you outgrown?" },
   { id: 'social-5-09', deck: 'social', depth: 5, text: "Who did you try way too hard to be accepted by?" },
