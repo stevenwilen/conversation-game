@@ -6,22 +6,21 @@ import type {
   Screen,
   TurnAction,
 } from './types'
-import { dealCard, deckById, emptyQueues } from './cards'
-import type { DeckQueues } from './cards'
+import { dealCard, deckById } from './cards'
 
 // Single source of truth for the game. A tiny state machine over the five
 // screens, persisted to localStorage so a refresh resumes mid-game.
 //
-// Turn model (locked in CLAUDE.md): every completed action — answer, lighter,
-// deeper — shows a transition and rotates the spotlight. Depth is a shared
-// group state that carries to the next player. Steering (lighter/deeper) is NOT
-// answering; it just sets the depth for whoever is next. A pending transition
-// can be undone (e.g. an accidental tap) before continuing to the next player.
+// Turn model (locked in CLAUDE.md): every completed action — stay, lighter,
+// deeper, pivot — shows a transition and rotates the spotlight. Depth is a
+// shared group state that carries to the next player. A pending transition can
+// be undone (e.g. an accidental tap) before continuing to the next player.
+// Cards never repeat within a game (see `seen`).
 
 // Bump this to invalidate older saved games so a new version starts fresh and
 // overrides any state left over from a previous version.
-const STORAGE_KEY = 'cg:v2'
-const LEGACY_KEYS = ['cg:v1']
+const STORAGE_KEY = 'cg:v3'
+const LEGACY_KEYS = ['cg:v1', 'cg:v2']
 
 export interface GameState {
   screen: Screen
@@ -37,8 +36,8 @@ export interface GameState {
   prevDepth: Depth | null
   /** Deck before a pending pivot, so the transition can be undone. */
   prevDeck: DeckId | null
-  /** Remaining shuffled prompts per depth, so questions don't repeat early. */
-  queues: DeckQueues
+  /** Every card text shown this game, so none repeats until forced. */
+  seen: string[]
 }
 
 const initialState: GameState = {
@@ -52,7 +51,7 @@ const initialState: GameState = {
   seenCoach: false,
   prevDepth: null,
   prevDeck: null,
-  queues: emptyQueues(),
+  seen: [],
 }
 
 type Action =
@@ -77,15 +76,15 @@ function reducer(state: GameState, action: Action): GameState {
       return { ...state, screen: 'setup' }
 
     case 'START': {
-      const dealt = dealCard(deckById(action.deck), emptyQueues(), action.depth)
+      const card = dealCard(deckById(action.deck), action.depth, [])
       return {
         ...state,
         players: action.players,
         spotlightIndex: 0,
         deck: action.deck,
         depth: action.depth,
-        card: dealt.card,
-        queues: dealt.queues,
+        card,
+        seen: [card],
         // Show the gesture coach at the start of every game, not just the first.
         seenCoach: false,
         lastAction: null,
@@ -109,14 +108,12 @@ function reducer(state: GameState, action: Action): GameState {
     }
 
     case 'PIVOT':
-      // Switch to another deck but keep the current depth. Like steering, it's
-      // not answering — it sets up the new topic and passes to the next player.
-      // Reset the queues so the next card is drawn fresh from the new deck, not
-      // from the old deck's leftover shuffle.
+      // Switch to another deck but keep the current depth. It sets up the new
+      // topic and passes to the next player. `seen` carries over, so pivoting
+      // never brings back a card already shown this game.
       return {
         ...state,
         deck: action.deck,
-        queues: emptyQueues(),
         prevDepth: state.depth,
         prevDeck: state.deck,
         lastAction: 'pivot',
@@ -126,17 +123,17 @@ function reducer(state: GameState, action: Action): GameState {
     case 'CONTINUE': {
       const count = state.players.length
       const nextIndex = count > 0 ? (state.spotlightIndex + 1) % count : 0
-      const dealt = dealCard(
+      const card = dealCard(
         deckById(state.deck),
-        state.queues,
         state.depth,
+        state.seen,
         state.card,
       )
       return {
         ...state,
         spotlightIndex: nextIndex,
-        card: dealt.card,
-        queues: dealt.queues,
+        card,
+        seen: [...state.seen, card],
         lastAction: null,
         prevDepth: null,
         prevDeck: null,
@@ -179,14 +176,15 @@ function loadInitial(): GameState {
     if (!parsed || typeof parsed !== 'object') return initialState
     if (!Array.isArray(parsed.players)) return initialState
     const merged: GameState = { ...initialState, ...parsed }
+    if (!Array.isArray(merged.seen)) merged.seen = []
     // If we resumed into gameplay without a card somehow, deal one.
     if (
       (merged.screen === 'playing' || merged.screen === 'transition') &&
       !merged.card
     ) {
-      const dealt = dealCard(deckById(merged.deck), merged.queues, merged.depth)
-      merged.card = dealt.card
-      merged.queues = dealt.queues
+      const card = dealCard(deckById(merged.deck), merged.depth, merged.seen)
+      merged.card = card
+      merged.seen = [...merged.seen, card]
     }
     return merged
   } catch {

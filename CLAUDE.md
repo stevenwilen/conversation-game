@@ -35,6 +35,8 @@ The prototype uses two decks:
 - Social Life
 - Growing Up
 
+Within a single game, a card never repeats until its level is fully exhausted.
+
 Each deck has five depth levels:
 
 - Depth 1

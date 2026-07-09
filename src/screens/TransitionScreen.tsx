@@ -111,21 +111,6 @@ export function TransitionScreen({
       }}
     >
       <div className="phone-frame text-white">
-        {/* Go back — undo an accidental tap/swipe. Available immediately, and
-            stops the tap from also continuing to the next player. */}
-        <div className="flex px-4 pt-4">
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation()
-              onUndo()
-            }}
-            className="rounded-full bg-white/12 px-4 py-2 text-[14px] font-semibold text-white/85"
-          >
-            ‹ Go back
-          </button>
-        </div>
-
         {/* Centered hand-off */}
         <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
           <div className="flex h-[74px] w-[74px] items-center justify-center rounded-full border border-white/15 bg-white/10 text-white">
@@ -164,6 +149,19 @@ export function TransitionScreen({
               </div>
             )}
           </div>
+
+          {/* Go back — undo an accidental tap/swipe. Sits by the continue hint
+              so it's easy to find, and stops the tap from also continuing. */}
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation()
+              onUndo()
+            }}
+            className="mt-5 rounded-full bg-white/12 px-4 py-2 text-[13px] font-semibold text-white/80"
+          >
+            ‹ Go back
+          </button>
         </div>
       </div>
     </motion.div>

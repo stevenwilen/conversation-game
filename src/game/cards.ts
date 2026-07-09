@@ -39,40 +39,24 @@ export function deckById(id: DeckId): Deck {
   return DECKS.find((deck) => deck.id === id) ?? SOCIAL
 }
 
-/** Per-depth queues of the remaining shuffled prompts for the current cycle. */
-export type DeckQueues = Record<Depth, string[]>
-
-export function emptyQueues(): DeckQueues {
-  return { 1: [], 2: [], 3: [], 4: [], 5: [] }
-}
-
-function shuffle(items: string[]): string[] {
-  const result = items.slice()
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    const tmp = result[i]
-    result[i] = result[j]
-    result[j] = tmp
-  }
-  return result
-}
-
-// Draw the next prompt for a depth from a shuffled queue: every question in the
-// level appears once before any repeats. Refills with a fresh shuffle when the
-// level is exhausted, avoiding an immediate repeat across that boundary.
+// Draw a prompt for a depth that hasn't been shown yet this game. `seen` is
+// every card text already shown (across all depths and decks), so nothing
+// repeats within a game. Only once a depth is fully exhausted do we fall back to
+// the full set — avoiding an immediate repeat — so a long stay at one level
+// still works.
 export function dealCard(
   deck: Deck,
-  queues: DeckQueues,
   depth: Depth,
+  seen: string[],
   avoid?: string,
-): { card: string; queues: DeckQueues } {
-  let queue = (queues[depth] ?? []).slice()
-  if (queue.length === 0) {
-    queue = shuffle(deck.cards[depth])
-    if (avoid && queue.length > 1 && queue[0] === avoid) {
-      queue.push(queue.shift() as string)
-    }
+): string {
+  const all = deck.cards[depth]
+  const unseen = all.filter((text) => !seen.includes(text))
+  if (unseen.length > 0) {
+    return unseen[Math.floor(Math.random() * unseen.length)]
   }
-  const card = queue.shift() as string
-  return { card, queues: { ...queues, [depth]: queue } }
+  // Every card at this depth has been seen — recycle, but not the current one.
+  const pool =
+    avoid && all.length > 1 ? all.filter((text) => text !== avoid) : all
+  return pool[Math.floor(Math.random() * pool.length)]
 }
