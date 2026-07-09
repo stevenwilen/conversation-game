@@ -18,6 +18,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
   const [players, setPlayers] = useState<Player[]>([])
   const [name, setName] = useState('')
   const [startDepth, setStartDepth] = useState<Depth>(1)
+  const [showLevels, setShowLevels] = useState(false)
   const [deckId, setDeckId] = useState<DeckId>('social')
   const idRef = useRef(0)
 
@@ -154,37 +155,60 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
             </div>
           </div>
 
-          {/* Starting depth */}
+          {/* Starting level — defaults to Level 1 and reads as a done decision.
+              The full picker is tucked behind "Change" so new players just start
+              at the beginning, while people who know the game can pick a level. */}
           <div className="mt-7">
             <div className="text-[13px] font-semibold uppercase tracking-[0.16em] text-[var(--color-ink)]/45">
-              Start at
+              Starting level
             </div>
-            <div className="mt-2.5 flex gap-2">
-              {DEPTHS.map((level) => {
-                const selected = level === startDepth
-                return (
-                  <motion.button
-                    key={level}
-                    type="button"
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setStartDepth(level)}
-                    className={`flex h-12 flex-1 items-center justify-center rounded-2xl text-[17px] font-bold transition ${
-                      selected
-                        ? 'bg-[var(--color-ink)] text-white'
-                        : 'bg-white/60 text-[var(--color-ink)]/60'
-                    }`}
-                  >
-                    {level}
-                  </motion.button>
-                )
-              })}
-            </div>
-            <div className="mt-2 text-balance text-[14px] font-medium text-[var(--color-ink)]/55">
-              <span className="font-bold text-[var(--color-ink)]/75">
-                {depthTheme.label}.
-              </span>{' '}
-              {depthTheme.blurb}
-            </div>
+
+            {showLevels ? (
+              <>
+                <div className="mt-2.5 flex gap-2">
+                  {DEPTHS.map((level) => {
+                    const selected = level === startDepth
+                    return (
+                      <motion.button
+                        key={level}
+                        type="button"
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setStartDepth(level)}
+                        className={`flex h-12 flex-1 items-center justify-center rounded-2xl text-[17px] font-bold transition ${
+                          selected
+                            ? 'bg-[var(--color-ink)] text-white'
+                            : 'bg-white/60 text-[var(--color-ink)]/60'
+                        }`}
+                      >
+                        {level}
+                      </motion.button>
+                    )
+                  })}
+                </div>
+                <div className="mt-2 text-balance text-[14px] font-medium text-[var(--color-ink)]/55">
+                  <span className="font-bold text-[var(--color-ink)]/75">
+                    {depthTheme.label}.
+                  </span>{' '}
+                  {depthTheme.blurb}
+                </div>
+              </>
+            ) : (
+              <div className="mt-2.5 flex items-center justify-between gap-3">
+                <div className="text-balance text-[14px] font-medium text-[var(--color-ink)]/55">
+                  <span className="font-bold text-[var(--color-ink)]/75">
+                    Level {startDepth} · {depthTheme.label}.
+                  </span>{' '}
+                  {depthTheme.blurb}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowLevels(true)}
+                  className="shrink-0 rounded-full bg-white/70 px-4 py-2 text-[13px] font-semibold text-[var(--color-ink)]/60"
+                >
+                  Change
+                </button>
+              </div>
+            )}
           </div>
 
           {/* CTA — flows with the content, sits at the bottom without pinning */}
