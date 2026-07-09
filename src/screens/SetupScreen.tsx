@@ -4,6 +4,7 @@ import type { Depth, DeckId, Player } from '../game/types'
 import { DEPTHS } from '../game/types'
 import { DEPTH_THEME, SETUP_BG } from '../game/theme'
 import { DECKS } from '../game/cards'
+import { DeckIcon } from '../components/DeckIcon'
 
 // Setup is allowed to have inputs — it's not gameplay. Kept light and chip-based
 // rather than form-like. The group picks one deck to play; in-game Pivot stays
@@ -88,7 +89,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
               placeholder="Add a name"
               maxLength={20}
               autoComplete="off"
-              className="w-full rounded-2xl bg-white/70 px-4 py-3.5 text-[17px] font-medium text-[var(--color-ink)] outline-none transition placeholder:text-[var(--color-ink)]/40 focus:bg-white"
+              className="w-full rounded-2xl bg-white px-4 py-3.5 text-[17px] font-medium text-[var(--color-ink)] outline-none transition placeholder:text-[var(--color-ink)]/40"
             />
             <motion.button
               type="submit"
@@ -116,7 +117,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
                   layout
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="flex items-center gap-2 rounded-full bg-white/75 py-2 pl-4 pr-3 text-[15px] font-semibold text-[var(--color-ink)]"
+                  className="flex items-center gap-2 rounded-full bg-white py-2 pl-4 pr-3 text-[15px] font-semibold text-[var(--color-ink)]"
                 >
                   {player.name}
                   <span className="text-[var(--color-ink)]/40">×</span>
@@ -125,30 +126,49 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
             )}
           </div>
 
-          {/* Deck */}
+          {/* Topic tiles — each deck is a colored, card-shaped tile with its own
+              icon, so they read as distinct topics at a glance. */}
           <div className="mt-8">
             <div className="text-[13px] font-semibold uppercase tracking-[0.16em] text-[var(--color-ink)]/45">
-              Deck
+              Topic
             </div>
-            <div className="mt-2.5 flex flex-col gap-2.5">
+            <div className="mt-2.5 grid grid-cols-2 gap-3">
               {DECKS.map((deck) => {
                 const selected = deck.id === deckId
                 return (
                   <motion.button
                     key={deck.id}
                     type="button"
-                    whileTap={{ scale: 0.98 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => setDeckId(deck.id)}
-                    className={`rounded-3xl p-4 text-left transition ${
+                    style={{ background: deck.color }}
+                    className={`relative flex aspect-[4/5] flex-col items-center justify-center gap-3 rounded-3xl p-3 text-white transition ${
                       selected
-                        ? 'bg-white/85 shadow-[0_4px_12px_rgba(20,16,26,0.14)] ring-2 ring-[var(--color-ink)]'
-                        : 'bg-white/55 ring-2 ring-transparent'
+                        ? 'opacity-100 ring-[3px] ring-[var(--color-ink)]'
+                        : 'opacity-55'
                     }`}
                   >
-                    <div className="text-[19px] font-bold">{deck.name}</div>
-                    <div className="mt-1 text-balance text-[13px] font-medium leading-snug text-[var(--color-ink)]/55">
-                      {deck.tagline}
-                    </div>
+                    <DeckIcon id={deck.id} />
+                    <span className="text-balance text-center text-[15px] font-bold leading-tight">
+                      {deck.name}
+                    </span>
+                    {selected && (
+                      <span className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-ink)] text-white">
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden
+                        >
+                          <path d="M5 13l4 4 10-11" />
+                        </svg>
+                      </span>
+                    )}
                   </motion.button>
                 )
               })}
@@ -177,7 +197,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
                         className={`flex h-12 flex-1 items-center justify-center rounded-2xl text-[17px] font-bold transition ${
                           selected
                             ? 'bg-[var(--color-ink)] text-white'
-                            : 'bg-white/60 text-[var(--color-ink)]/60'
+                            : 'bg-white text-[var(--color-ink)]/60'
                         }`}
                       >
                         {level}
@@ -203,7 +223,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
                 <button
                   type="button"
                   onClick={() => setShowLevels(true)}
-                  className="shrink-0 rounded-full bg-white/70 px-4 py-2 text-[13px] font-semibold text-[var(--color-ink)]/60"
+                  className="shrink-0 rounded-full bg-white px-4 py-2 text-[13px] font-semibold text-[var(--color-ink)]/60"
                 >
                   Change
                 </button>

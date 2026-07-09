@@ -2,9 +2,9 @@ import { DEPTHS } from '../game/types'
 import type { Depth } from '../game/types'
 import { DEPTH_THEME } from '../game/theme'
 
-// Depth HUD (P4). The background gradient signals depth by color; this pill
-// makes the exact level readable at a glance: filled pips + the level name +
-// an "n/5" position so players always know how deep the group is.
+// Depth HUD (P4). The background color signals depth; this pill spells out the
+// current level so it's unmistakable: filled pips + "Level n" + the level's
+// name (e.g. "Level 1 · Surface").
 
 interface DepthMeterProps {
   depth: Depth
@@ -30,10 +30,10 @@ export function DepthMeter({ depth }: DepthMeterProps) {
       </div>
       <span className="flex items-baseline gap-1.5 leading-none">
         <span className="text-[14px] font-bold tracking-tight">
-          {theme.label}
+          Level {depth}
         </span>
         <span className="text-[12px] font-semibold text-white/55">
-          {depth}/5
+          · {theme.label}
         </span>
       </span>
     </div>

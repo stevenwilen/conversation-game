@@ -71,10 +71,11 @@ function ActionIcon({ action }: { action: TurnAction | null }) {
       </svg>
     )
   }
-  // Stay at the same level: a simple horizontal mark, no up or down.
+  // Stay at the same level: a "you're here / holding this spot" marker.
   return (
     <svg {...svg}>
-      <path d="M6 12h12" />
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none" />
     </svg>
   )
 }

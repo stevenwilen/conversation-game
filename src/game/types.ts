@@ -24,6 +24,8 @@ export interface Deck {
   id: DeckId
   name: string
   tagline: string
+  /** Solid identity color for the deck (used on the topic tiles). */
+  color: string
   /** Prompts keyed by depth level. */
   cards: Record<Depth, string[]>
 }

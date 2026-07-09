@@ -23,6 +23,7 @@ export const SOCIAL: Deck = {
   id: 'social',
   name: 'Social Life',
   tagline: 'For the people who already know your worst jokes.',
+  color: '#EE7A5F',
   cards: groupByDepth(),
 }
 
@@ -30,6 +31,7 @@ export const GROWING_UP: Deck = {
   id: 'growingup',
   name: 'Growing Up',
   tagline: 'Back when everything felt like a big deal.',
+  color: '#47A98C',
   cards: growingUpCards,
 }
 
@@ -37,6 +39,7 @@ export const HOT_TAKES: Deck = {
   id: 'hottakes',
   name: 'Hot Takes',
   tagline: 'Say the thing you usually keep to yourself.',
+  color: '#E85C63',
   cards: hotTakesCards,
 }
 
