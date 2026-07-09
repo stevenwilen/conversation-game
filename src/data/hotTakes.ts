@@ -1,0 +1,67 @@
+import type { Depth } from '../game/types'
+
+// Hot Takes deck — 50 prompts, 10 per depth level. Verbatim from the source; do
+// not reword. Level N maps to depth N (surface → very deep).
+
+export const hotTakesCards: Record<Depth, string[]> = {
+  1: [
+    "What do you think about cereal for breakfast?",
+    "Which fast food place is overrated?",
+    "What show or movie isn’t as good as people say it is?",
+    "Which chore is actually not that bad?",
+    "What food gets way too much hype?",
+    "Which snack is better than most meals?",
+    "What song do people act like is better than it is?",
+    "What’s a normal thing people enjoy that you don’t?",
+    "Which holiday is not as fun as people make it seem?",
+    "What cheap thing is better than the expensive version?",
+  ],
+  2: [
+    "What do you think about people being late?",
+    "How much should people care about birthdays?",
+    "What place sounds fun but usually isn’t?",
+    "What do you think about road trips?",
+    "What do people buy just because everyone else has it?",
+    "What do you think about people who always need plans?",
+    "What do people make too big of a deal about?",
+    "What is fun for other people but sounds exhausting to you?",
+    "What do people pretend is relaxing but really isn’t?",
+    "What trend do people defend way too hard?",
+  ],
+  3: [
+    "When is being too honest annoying?",
+    "What compliment feels fake?",
+    "What makes someone fake nice?",
+    "What is a common hot take you have?",
+    "What do people brag about that is not impressive?",
+    "Who gets judged too harshly?",
+    "Is it worse to be boring or annoying?",
+    "What do people call “mature” that might just be boring?",
+    "What do people think makes them unique, but doesn’t?",
+    "What normal habit makes someone harder to be around?",
+  ],
+  4: [
+    "What do you think about cutting people off?",
+    "What do people use as an excuse for being selfish?",
+    "What do people forgive too easily?",
+    "When is being chill actually a bad thing?",
+    "What do people call loyalty that might just be fear?",
+    "What behavior gets ignored when the person is funny?",
+    "Who gets away with the most in a group?",
+    "What do people overreact to the most?",
+    "What do people act like they don’t care about, but definitely do?",
+    "What kind of person gets too much sympathy?",
+  ],
+  5: [
+    "What do most people lie to themselves about?",
+    "Who do people respect for the wrong reasons?",
+    "What do people only believe because it helps them?",
+    "What is your personal hottest take?",
+    "Are most people as good as they think they are?",
+    "What sounds mean but is usually true?",
+    "What do people pretend is a virtue, but really isn’t?",
+    "What kind of person is harder to trust than people admit?",
+    "What opinion would make people look at you differently?",
+    "What do people only realize once it happens to them?",
+  ],
+}

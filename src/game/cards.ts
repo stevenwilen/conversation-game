@@ -1,6 +1,7 @@
 import type { Deck, DeckId, Depth } from './types'
 import { socialCards } from '../data/social'
 import { growingUpCards } from '../data/growingUp'
+import { hotTakesCards } from '../data/hotTakes'
 
 // ---------------------------------------------------------------------------
 // Social deck — the only deck in the first prototype.
@@ -32,7 +33,14 @@ export const GROWING_UP: Deck = {
   cards: growingUpCards,
 }
 
-export const DECKS: Deck[] = [SOCIAL, GROWING_UP]
+export const HOT_TAKES: Deck = {
+  id: 'hottakes',
+  name: 'Hot Takes',
+  tagline: 'Say the thing you usually keep to yourself.',
+  cards: hotTakesCards,
+}
+
+export const DECKS: Deck[] = [SOCIAL, GROWING_UP, HOT_TAKES]
 
 /** Look up a deck by id, falling back to the first deck. */
 export function deckById(id: DeckId): Deck {
