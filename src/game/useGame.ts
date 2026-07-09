@@ -76,7 +76,7 @@ function reducer(state: GameState, action: Action): GameState {
       return { ...state, screen: 'setup' }
 
     case 'START': {
-      const card = dealCard(deckById(action.deck), action.depth, [])
+      const card = dealCard(deckById(action.deck), action.depth, []) ?? ''
       return {
         ...state,
         players: action.players,
@@ -84,7 +84,7 @@ function reducer(state: GameState, action: Action): GameState {
         deck: action.deck,
         depth: action.depth,
         card,
-        seen: [card],
+        seen: card ? [card] : [],
         // Show the gesture coach at the start of every game, not just the first.
         seenCoach: false,
         lastAction: null,
@@ -123,17 +123,12 @@ function reducer(state: GameState, action: Action): GameState {
     case 'CONTINUE': {
       const count = state.players.length
       const nextIndex = count > 0 ? (state.spotlightIndex + 1) % count : 0
-      const card = dealCard(
-        deckById(state.deck),
-        state.depth,
-        state.seen,
-        state.card,
-      )
+      const card = dealCard(deckById(state.deck), state.depth, state.seen) ?? ''
       return {
         ...state,
         spotlightIndex: nextIndex,
         card,
-        seen: [...state.seen, card],
+        seen: card ? [...state.seen, card] : state.seen,
         lastAction: null,
         prevDepth: null,
         prevDeck: null,
@@ -183,8 +178,10 @@ function loadInitial(): GameState {
       !merged.card
     ) {
       const card = dealCard(deckById(merged.deck), merged.depth, merged.seen)
-      merged.card = card
-      merged.seen = [...merged.seen, card]
+      if (card) {
+        merged.card = card
+        merged.seen = [...merged.seen, card]
+      }
     }
     return merged
   } catch {

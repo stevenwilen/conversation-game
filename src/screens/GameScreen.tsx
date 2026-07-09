@@ -61,6 +61,8 @@ export function GameScreen({
   const canLighter = depth > 1
   const canDeeper = depth < 5
   const canPivot = DECKS.some((deck) => deck.id !== deckId)
+  // No card left at this level this game — steer deeper/lighter or pivot.
+  const exhausted = card === ''
   const haptic = useHaptics()
 
   const [showCoach, setShowCoach] = useState(!seenCoach)
@@ -115,6 +117,8 @@ export function GameScreen({
   }
 
   function handleTap() {
+    // Nothing to stay for once the level is out of cards.
+    if (exhausted) return
     // A committed swipe already handled this gesture — don't also stay.
     if (committedRef.current) {
       committedRef.current = false
@@ -185,12 +189,14 @@ export function GameScreen({
               transition={{ duration: 0.28, ease: 'easeOut' }}
             >
               <CardSurface
-                text={card}
+                text={exhausted ? 'That’s every card at this level.' : card}
                 topic={topic}
                 accent={theme.accent}
                 footer={
                   <span className="text-[13px] font-medium text-[var(--color-ink)]/35">
-                    Answer, then choose
+                    {exhausted
+                      ? 'Swipe or pivot to keep going'
+                      : 'Answer, then choose'}
                   </span>
                 }
               />
@@ -204,8 +210,12 @@ export function GameScreen({
               style={{ textShadow: '0 1px 3px rgba(0,0,0,0.25)' }}
             >
               <span style={{ opacity: canLighter ? 0.9 : 0.3 }}>‹ Lighter</span>
-              <span className="text-white/35">·</span>
-              <span className="opacity-90">Tap to stay</span>
+              {!exhausted && (
+                <>
+                  <span className="text-white/35">·</span>
+                  <span className="opacity-90">Tap to stay</span>
+                </>
+              )}
               <span className="text-white/35">·</span>
               <span style={{ opacity: canDeeper ? 0.9 : 0.3 }}>Deeper ›</span>
             </div>

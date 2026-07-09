@@ -41,22 +41,15 @@ export function deckById(id: DeckId): Deck {
 
 // Draw a prompt for a depth that hasn't been shown yet this game. `seen` is
 // every card text already shown (across all depths and decks), so nothing
-// repeats within a game. Only once a depth is fully exhausted do we fall back to
-// the full set — avoiding an immediate repeat — so a long stay at one level
-// still works.
+// repeats within a game. Returns null once a level is exhausted — the game then
+// shows an "out of cards here" state that steers the group deeper/lighter or to
+// another topic rather than recycling.
 export function dealCard(
   deck: Deck,
   depth: Depth,
   seen: string[],
-  avoid?: string,
-): string {
-  const all = deck.cards[depth]
-  const unseen = all.filter((text) => !seen.includes(text))
-  if (unseen.length > 0) {
-    return unseen[Math.floor(Math.random() * unseen.length)]
-  }
-  // Every card at this depth has been seen — recycle, but not the current one.
-  const pool =
-    avoid && all.length > 1 ? all.filter((text) => text !== avoid) : all
-  return pool[Math.floor(Math.random() * pool.length)]
+): string | null {
+  const unseen = deck.cards[depth].filter((text) => !seen.includes(text))
+  if (unseen.length === 0) return null
+  return unseen[Math.floor(Math.random() * unseen.length)]
 }
