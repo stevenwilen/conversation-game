@@ -67,7 +67,11 @@ export function DeckCarousel({ decks, selectedId, onSelect }: DeckCarouselProps)
 
   return (
     <div>
-      <div ref={containerRef} className="overflow-hidden">
+      {/* Vertical padding gives the card shadows room to render inside the clip
+          region; horizontal clipping stays at the (full-bleed) edges so cards
+          slide in and out cleanly. clientWidth is unaffected by py, so the
+          peek/snap math stays correct. */}
+      <div ref={containerRef} className="overflow-hidden py-6">
         <motion.div
           className="flex"
           style={{ x, gap: GAP }}
@@ -92,7 +96,7 @@ export function DeckCarousel({ decks, selectedId, onSelect }: DeckCarouselProps)
       </div>
 
       {/* Page dots — active one stretches to a pill. */}
-      <div className="mt-4 flex items-center justify-center gap-2">
+      <div className="mt-1 flex items-center justify-center gap-2">
         {decks.map((deck, i) => (
           <button
             key={deck.id}

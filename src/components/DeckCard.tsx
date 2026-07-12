@@ -1,10 +1,12 @@
 import type { Deck } from '../game/types'
 import { DeckIcon } from './DeckIcon'
 
-// A deck shown as a real game card (cream face, deck-color icon badge, name,
-// tagline, card-count footer) so the group feels the game before starting.
-// Used inside DeckCarousel; the centered/active card sits full-strength while
-// the peeking neighbors dim and shrink to signal "swipe me".
+// A deck rendered as an actual topic card, not a feature tile: the deck's color
+// IS the card surface, wrapped in an inset frame with playing-card corner
+// indices, a centered emblem, the deck name, and card metadata. Flat colors
+// only (no gradients/glows) so it still reads as a prototype. Used inside
+// DeckCarousel; the centered/active card is full-strength while peeking
+// neighbors dim and shrink.
 
 function cardCount(deck: Deck): number {
   return Object.values(deck.cards).reduce((total, level) => total + level.length, 0)
@@ -22,36 +24,51 @@ export function DeckCard({ deck, active, onClick }: DeckCardProps) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className="flex h-[336px] w-full flex-col justify-between rounded-[var(--radius-card)] bg-[var(--color-cream)] px-7 pb-7 pt-7 text-left transition-[transform,opacity,box-shadow] duration-300 ease-[var(--ease-soft)]"
+      className="relative flex h-[356px] w-full flex-col items-center justify-center overflow-hidden rounded-[26px] px-7 text-center text-white transition-[transform,opacity,box-shadow] duration-300 ease-[var(--ease-soft)]"
       style={{
-        opacity: active ? 1 : 0.55,
-        transform: active ? 'scale(1)' : 'scale(0.93)',
+        background: deck.color,
+        opacity: active ? 1 : 0.5,
+        transform: active ? 'scale(1)' : 'scale(0.92)',
         boxShadow: active
-          ? '0 14px 30px rgba(120,72,40,0.18)'
-          : '0 4px 14px rgba(120,72,40,0.10)',
+          ? '0 16px 34px rgba(60,30,10,0.30)'
+          : '0 6px 16px rgba(60,30,10,0.16)',
       }}
     >
-      <div
-        className="flex h-16 w-16 items-center justify-center rounded-2xl text-white"
-        style={{ background: deck.color }}
-      >
-        <DeckIcon id={deck.id} size={34} />
+      {/* Inset card frame */}
+      <div className="pointer-events-none absolute inset-[10px] rounded-[18px] border border-white/25" />
+
+      {/* Large faded emblem for texture — flat, no glow */}
+      <div className="pointer-events-none absolute -bottom-10 -right-8 text-white/10">
+        <DeckIcon id={deck.id} size={210} />
       </div>
 
-      <div>
-        <h3 className="text-[28px] font-bold leading-[1.1] tracking-[-0.01em] text-[var(--color-ink)]">
+      {/* Playing-card corner indices */}
+      <div className="pointer-events-none absolute left-5 top-5 text-white/75">
+        <DeckIcon id={deck.id} size={22} />
+      </div>
+      <div className="pointer-events-none absolute bottom-5 right-5 rotate-180 text-white/75">
+        <DeckIcon id={deck.id} size={22} />
+      </div>
+
+      {/* Center emblem + title (nudged up to sit optically above the footer) */}
+      <div className="relative -mt-4 flex flex-col items-center">
+        <div className="flex h-[74px] w-[74px] items-center justify-center rounded-full bg-white/20">
+          <DeckIcon id={deck.id} size={40} />
+        </div>
+        <h3 className="mt-5 text-[30px] font-extrabold leading-[1.05] tracking-[-0.015em]">
           {deck.name}
         </h3>
-        <p className="mt-2 text-balance text-[15px] font-medium leading-snug text-[var(--color-ink)]/55">
+        <p className="mt-2 max-w-[15rem] text-balance text-[15px] font-medium leading-snug text-white/85">
           {deck.tagline}
         </p>
       </div>
 
-      <div
-        className="text-[12px] font-bold uppercase tracking-[0.18em]"
-        style={{ color: deck.color }}
-      >
-        {cardCount(deck)} cards · 5 levels
+      {/* Footer metadata */}
+      <div className="absolute bottom-6 flex flex-col items-center gap-2.5">
+        <span className="h-px w-8 bg-white/35" />
+        <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/80">
+          {cardCount(deck)} cards
+        </span>
       </div>
     </button>
   )

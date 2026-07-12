@@ -13,7 +13,7 @@ import { DeckCarousel } from '../components/DeckCarousel'
 // "Change" so the group isn't nudged to jump ahead. Not gameplay, so inputs are
 // allowed, but it's kept chip- and card-based rather than form-like.
 
-const MAX_PLAYERS = 8
+const MAX_PLAYERS = 12
 
 // Warm, playful avatar colors, assigned by add-order. Purely decorative — the
 // player-facing system stays Deck + Depth + Spotlight.
@@ -65,7 +65,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
 
   return (
     <motion.div
-      className="absolute inset-0 overflow-y-auto overscroll-y-contain"
+      className="absolute inset-0 overflow-y-auto overscroll-none"
       style={{ background: SETUP_BG }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -134,7 +134,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
           <div className="mt-4 flex flex-wrap gap-2">
             {players.length === 0 ? (
               <span className="text-[14px] font-medium text-[var(--color-ink)]/40">
-                Nobody yet — add the first player.
+                Nobody yet. Add the first player.
               </span>
             ) : (
               players.map((player, i) => {
@@ -174,7 +174,10 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
             <div className="text-[13px] font-semibold uppercase tracking-[0.16em] text-[var(--color-ink)]/45">
               Topic
             </div>
-            <div className="mt-3">
+            {/* Full-bleed (-mx-6) so the carousel's edge clip lands at the
+                screen edge, letting neighbor cards peek naturally instead of
+                being hard-cut in the gutter. */}
+            <div className="mt-2 -mx-6">
               <DeckCarousel
                 decks={DECKS}
                 selectedId={deckId}
@@ -203,54 +206,58 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
               )}
             </div>
 
-            {showLevels ? (
-              <div className="mt-2.5 flex gap-2">
-                {DEPTHS.map((level) => {
-                  const selected = level === startDepth
-                  return (
-                    <motion.button
-                      key={level}
-                      type="button"
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => {
-                        setStartDepth(level)
-                        setShowLevels(false)
-                      }}
-                      className={`flex h-12 flex-1 items-center justify-center rounded-2xl text-[17px] font-bold transition ${
-                        selected
-                          ? 'text-white'
-                          : 'bg-white text-[var(--color-ink)]/55'
-                      }`}
-                      style={
-                        selected ? { background: DEPTH_THEME[level].accent } : undefined
-                      }
-                    >
-                      {level}
-                    </motion.button>
-                  )
-                })}
-              </div>
-            ) : (
-              <div
-                className="mt-2.5 flex items-center gap-3.5 rounded-2xl px-4 py-3.5"
-                style={{ background: `${depthTheme.accent}1A` }}
-              >
-                <span
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[15px] font-extrabold text-white"
-                  style={{ background: depthTheme.accent }}
+            {/* Fixed height so toggling the picker never resizes the section
+                (which would nudge the CTA). Both states fill this box. */}
+            <div className="mt-2.5 flex h-[72px] items-center">
+              {showLevels ? (
+                <div className="flex w-full gap-2">
+                  {DEPTHS.map((level) => {
+                    const selected = level === startDepth
+                    return (
+                      <motion.button
+                        key={level}
+                        type="button"
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => {
+                          setStartDepth(level)
+                          setShowLevels(false)
+                        }}
+                        className={`flex h-12 flex-1 items-center justify-center rounded-2xl text-[17px] font-bold transition ${
+                          selected
+                            ? 'text-white'
+                            : 'bg-white text-[var(--color-ink)]/55'
+                        }`}
+                        style={
+                          selected ? { background: DEPTH_THEME[level].accent } : undefined
+                        }
+                      >
+                        {level}
+                      </motion.button>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div
+                  className="flex h-full w-full items-center gap-3.5 rounded-2xl px-4"
+                  style={{ background: `${depthTheme.accent}1A` }}
                 >
-                  {startDepth}
-                </span>
-                <div>
-                  <div className="text-[16px] font-bold text-[var(--color-ink)]">
-                    {depthTheme.label}
-                  </div>
-                  <div className="mt-0.5 text-[14px] font-medium text-[var(--color-ink)]/55">
-                    {depthTheme.blurb}
+                  <span
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[15px] font-extrabold text-white"
+                    style={{ background: depthTheme.accent }}
+                  >
+                    {startDepth}
+                  </span>
+                  <div>
+                    <div className="text-[16px] font-bold text-[var(--color-ink)]">
+                      {depthTheme.label}
+                    </div>
+                    <div className="mt-0.5 text-[14px] font-medium text-[var(--color-ink)]/55">
+                      {depthTheme.blurb}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 
