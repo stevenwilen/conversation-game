@@ -91,19 +91,14 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
         {/* Scrolling body */}
         <div className="flex-1 px-6 pb-4">
           {/* ---- Who's playing ------------------------------------------- */}
-          <div className="mt-5 flex items-end justify-between gap-3">
-            <h1 className="text-[38px] font-extrabold leading-[1.02] tracking-[-0.02em]">
-              Who's
-              <br />
-              playing?
+          <div className="mt-5 flex items-center justify-between gap-3">
+            <h1 className="whitespace-nowrap text-[36px] font-extrabold leading-[1.02] tracking-[-0.02em]">
+              Who's playing?
             </h1>
-            <span className="rounded-full bg-white/70 px-3 py-1 text-[13px] font-bold text-[var(--color-ink)]/55 shadow-[0_1px_4px_rgba(120,72,40,0.08)]">
+            <span className="shrink-0 rounded-full bg-white/70 px-3 py-1 text-[13px] font-bold text-[var(--color-ink)]/55 shadow-[0_1px_4px_rgba(120,72,40,0.08)]">
               {players.length} of {MAX_PLAYERS}
             </span>
           </div>
-          <p className="mt-3 text-balance text-[15px] font-medium text-[var(--color-ink)]/55">
-            Pass the phone around and add everyone. Two or more.
-          </p>
 
           {/* Add player */}
           <form
@@ -209,40 +204,32 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
             </div>
 
             {showLevels ? (
-              <>
-                <div className="mt-2.5 flex gap-2">
-                  {DEPTHS.map((level) => {
-                    const selected = level === startDepth
-                    return (
-                      <motion.button
-                        key={level}
-                        type="button"
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => {
-                          setStartDepth(level)
-                          setShowLevels(false)
-                        }}
-                        className={`flex h-12 flex-1 items-center justify-center rounded-2xl text-[17px] font-bold transition ${
-                          selected
-                            ? 'text-white'
-                            : 'bg-white text-[var(--color-ink)]/55'
-                        }`}
-                        style={
-                          selected ? { background: DEPTH_THEME[level].accent } : undefined
-                        }
-                      >
-                        {level}
-                      </motion.button>
-                    )
-                  })}
-                </div>
-                <div className="mt-2 text-balance text-[14px] font-medium text-[var(--color-ink)]/55">
-                  <span className="font-bold text-[var(--color-ink)]/75">
-                    {depthTheme.label}.
-                  </span>{' '}
-                  {depthTheme.blurb}
-                </div>
-              </>
+              <div className="mt-2.5 flex gap-2">
+                {DEPTHS.map((level) => {
+                  const selected = level === startDepth
+                  return (
+                    <motion.button
+                      key={level}
+                      type="button"
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => {
+                        setStartDepth(level)
+                        setShowLevels(false)
+                      }}
+                      className={`flex h-12 flex-1 items-center justify-center rounded-2xl text-[17px] font-bold transition ${
+                        selected
+                          ? 'text-white'
+                          : 'bg-white text-[var(--color-ink)]/55'
+                      }`}
+                      style={
+                        selected ? { background: DEPTH_THEME[level].accent } : undefined
+                      }
+                    >
+                      {level}
+                    </motion.button>
+                  )
+                })}
+              </div>
             ) : (
               <div
                 className="mt-2.5 flex items-center gap-3.5 rounded-2xl px-4 py-3.5"
