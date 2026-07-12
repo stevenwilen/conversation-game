@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import type { Depth, DeckId, Player } from '../game/types'
-import { DEPTHS } from '../game/types'
 import { DEPTH_THEME, SETUP_BG } from '../game/theme'
 import { DECKS } from '../game/cards'
 import { DeckCarousel } from '../components/DeckCarousel'
@@ -37,7 +36,6 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
   const [players, setPlayers] = useState<Player[]>([])
   const [name, setName] = useState('')
   const [startDepth, setStartDepth] = useState<Depth>(1)
-  const [showLevels, setShowLevels] = useState(false)
   const [deckId, setDeckId] = useState<DeckId>('social')
   const idRef = useRef(0)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -187,77 +185,24 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
           </div>
 
           {/* ---- Starting level ------------------------------------------
-              Shows ONLY the recommended level by default. The full picker is
-              deliberately tucked behind a quiet "Change" so the group isn't
-              nudged to skip ahead of Level 1. */}
-          <div className="mt-9">
-            <div className="flex items-center justify-between">
-              <div className="text-[13px] font-semibold uppercase tracking-[0.16em] text-[var(--color-ink)]/45">
-                Starting level
-              </div>
-              {!showLevels && (
-                <button
-                  type="button"
-                  onClick={() => setShowLevels(true)}
-                  className="text-[13px] font-semibold text-[var(--color-ink)]/45"
-                >
-                  Change ›
-                </button>
-              )}
-            </div>
-
-            {/* Fixed height so toggling the picker never resizes the section
-                (which would nudge the CTA). Both states fill this box. */}
-            <div className="mt-2.5 flex h-[72px] items-center">
-              {showLevels ? (
-                <div className="flex w-full gap-2">
-                  {DEPTHS.map((level) => {
-                    const selected = level === startDepth
-                    return (
-                      <motion.button
-                        key={level}
-                        type="button"
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => {
-                          setStartDepth(level)
-                          setShowLevels(false)
-                        }}
-                        className={`flex h-12 flex-1 items-center justify-center rounded-2xl text-[17px] font-bold transition ${
-                          selected
-                            ? 'text-white'
-                            : 'bg-white text-[var(--color-ink)]/55'
-                        }`}
-                        style={
-                          selected ? { background: DEPTH_THEME[level].accent } : undefined
-                        }
-                      >
-                        {level}
-                      </motion.button>
-                    )
-                  })}
-                </div>
-              ) : (
-                <div
-                  className="flex h-full w-full items-center gap-3.5 rounded-2xl px-4"
-                  style={{ background: `${depthTheme.accent}1A` }}
-                >
-                  <span
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[15px] font-extrabold text-white"
-                    style={{ background: depthTheme.accent }}
-                  >
-                    {startDepth}
-                  </span>
-                  <div>
-                    <div className="text-[16px] font-bold text-[var(--color-ink)]">
-                      {depthTheme.label}
-                    </div>
-                    <div className="mt-0.5 text-[14px] font-medium text-[var(--color-ink)]/55">
-                      {depthTheme.blurb}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+              A single line, defaulting to the recommended Level 1. "Change"
+              simply advances the level (wrapping 5 -> 1) so it never nudges the
+              group toward a picker of options. */}
+          <div className="mt-8 flex h-11 items-center justify-between">
+            <p className="text-[15px] font-medium text-[var(--color-ink)]/55">
+              Starting at{' '}
+              <span className="font-bold text-[var(--color-ink)]">
+                Level {startDepth}
+              </span>
+              <span className="text-[var(--color-ink)]/45"> · {depthTheme.label}</span>
+            </p>
+            <button
+              type="button"
+              onClick={() => setStartDepth((current) => ((current % 5) + 1) as Depth)}
+              className="shrink-0 text-[13px] font-semibold text-[var(--color-ink)]/45"
+            >
+              Change ›
+            </button>
           </div>
         </div>
 

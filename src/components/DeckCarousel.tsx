@@ -8,8 +8,11 @@ import { DeckCard } from './DeckCard'
 // affordance is obvious. Selecting = whatever is centered, so there's no extra
 // "confirm" tap. Tapping a side card or a dot also centers it.
 
-const GAP = 16 // px between cards
-const PEEK = 0.82 // active card takes 82% of the width, leaving edges to peek
+const GAP = 18 // px between cards
+// Fixed card width matching the question card's portrait proportions
+// (~2.5:3.5 poker-card ratio) at the 300px card height, rather than a share of
+// the (full-bleed) container width — otherwise the cards render landscape.
+const CARD_WIDTH = 214
 const SNAP = { type: 'spring' as const, stiffness: 320, damping: 34 }
 
 interface DeckCarouselProps {
@@ -28,7 +31,8 @@ export function DeckCarousel({ decks, selectedId, onSelect }: DeckCarouselProps)
     decks.findIndex((deck) => deck.id === selectedId),
   )
 
-  const cardWidth = width * PEEK
+  // Clamp so the card never exceeds a narrow viewport (leaving room to peek).
+  const cardWidth = width === 0 ? CARD_WIDTH : Math.min(CARD_WIDTH, width - 80)
   const step = cardWidth + GAP
   const sideInset = (width - cardWidth) / 2 // centers the active card
 
