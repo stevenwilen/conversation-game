@@ -1,5 +1,4 @@
 import type { Deck } from '../game/types'
-import { DeckIcon } from './DeckIcon'
 import { DeckBackdropIcon } from './DeckBackdropIcon'
 
 // A deck rendered as an actual topic card, not a feature tile: the deck's color
@@ -41,12 +40,9 @@ export function DeckCard({ deck, active, onClick }: DeckCardProps) {
         <DeckBackdropIcon id={deck.id} size={210} />
       </div>
 
-      {/* Center emblem + title (nudged up to sit optically above the footer) */}
+      {/* Title (nudged up to sit optically above the footer) */}
       <div className="relative -mt-4 flex flex-col items-center">
-        <div className="flex h-[74px] w-[74px] items-center justify-center rounded-full bg-white/20">
-          <DeckIcon id={deck.id} size={40} />
-        </div>
-        <h3 className="mt-5 text-[30px] font-extrabold leading-[1.05] tracking-[-0.015em]">
+        <h3 className="text-[30px] font-extrabold leading-[1.05] tracking-[-0.015em]">
           {deck.name}
         </h3>
         <p className="mt-2 max-w-[15rem] text-balance text-[15px] font-medium leading-snug text-white/85">
