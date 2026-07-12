@@ -24,16 +24,13 @@ export function DeckCard({ deck, active, onClick }: DeckCardProps) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className="relative flex h-[356px] w-full flex-col items-center justify-center overflow-hidden rounded-[26px] px-7 text-center text-white transition-[transform,opacity] duration-300 ease-[var(--ease-soft)]"
+      className="relative flex h-[300px] w-full flex-col items-center justify-center overflow-hidden rounded-[26px] px-7 text-center text-white transition-[transform,opacity] duration-300 ease-[var(--ease-soft)]"
       style={{
         background: deck.color,
         opacity: active ? 1 : 0.5,
         transform: active ? 'scale(1)' : 'scale(0.92)',
       }}
     >
-      {/* Inset card frame */}
-      <div className="pointer-events-none absolute inset-[10px] rounded-[18px] border border-white/25" />
-
       {/* Large faded backdrop motif for texture — a distinct icon from the
           foreground emblem, flat, no glow. */}
       <div className="pointer-events-none absolute -bottom-10 -right-8 text-white/10">
