@@ -24,11 +24,11 @@ export function DeckCard({ deck, active, onClick }: DeckCardProps) {
       aria-pressed={active}
       className="flex h-[336px] w-full flex-col justify-between rounded-[var(--radius-card)] bg-[var(--color-cream)] px-7 pb-7 pt-7 text-left transition-[transform,opacity,box-shadow] duration-300 ease-[var(--ease-soft)]"
       style={{
-        opacity: active ? 1 : 0.5,
+        opacity: active ? 1 : 0.55,
         transform: active ? 'scale(1)' : 'scale(0.93)',
         boxShadow: active
-          ? '0 12px 28px rgba(20,16,26,0.18)'
-          : '0 4px 14px rgba(20,16,26,0.10)',
+          ? '0 14px 30px rgba(120,72,40,0.18)'
+          : '0 4px 14px rgba(120,72,40,0.10)',
       }}
     >
       <div

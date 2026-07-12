@@ -91,15 +91,17 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
         {/* Scrolling body */}
         <div className="flex-1 px-6 pb-4">
           {/* ---- Who's playing ------------------------------------------- */}
-          <div className="mt-4 flex items-end justify-between gap-3">
-            <h1 className="text-[34px] font-bold leading-tight tracking-[-0.01em]">
-              Who's playing?
+          <div className="mt-5 flex items-end justify-between gap-3">
+            <h1 className="text-[38px] font-extrabold leading-[1.02] tracking-[-0.02em]">
+              Who's
+              <br />
+              playing?
             </h1>
-            <span className="pb-1.5 text-[14px] font-semibold text-[var(--color-ink)]/45">
+            <span className="rounded-full bg-white/70 px-3 py-1 text-[13px] font-bold text-[var(--color-ink)]/55 shadow-[0_1px_4px_rgba(120,72,40,0.08)]">
               {players.length} of {MAX_PLAYERS}
             </span>
           </div>
-          <p className="mt-1.5 text-balance text-[15px] font-medium text-[var(--color-ink)]/55">
+          <p className="mt-3 text-balance text-[15px] font-medium text-[var(--color-ink)]/55">
             Pass the phone around and add everyone. Two or more.
           </p>
 
@@ -119,51 +121,56 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
               maxLength={20}
               autoComplete="off"
               disabled={atCapacity}
-              className="w-full rounded-2xl bg-white px-4 py-3.5 text-[17px] font-medium text-[var(--color-ink)] outline-none transition placeholder:text-[var(--color-ink)]/40 disabled:opacity-50"
+              className="w-full rounded-2xl bg-white px-4 py-3.5 text-[17px] font-semibold text-[var(--color-ink)] shadow-[0_2px_10px_rgba(120,72,40,0.08)] outline-none transition placeholder:font-medium placeholder:text-[var(--color-ink)]/35 focus:shadow-[0_2px_14px_rgba(120,72,40,0.14)] disabled:opacity-50"
             />
             <motion.button
               type="submit"
               whileTap={{ scale: 0.92 }}
               disabled={!name.trim() || atCapacity}
-              className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl bg-[var(--color-ink)] text-2xl font-light text-white disabled:opacity-30"
+              className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl bg-[var(--color-ink)] text-2xl font-light text-white shadow-[0_4px_12px_rgba(20,16,26,0.22)] transition disabled:opacity-30 disabled:shadow-none"
               aria-label="Add player"
             >
               +
             </motion.button>
           </form>
 
-          {/* Player chips */}
+          {/* Player chips — each tinted with its avatar color so the roster
+              feels lively and personal, not like form tokens. */}
           <div className="mt-4 flex flex-wrap gap-2">
             {players.length === 0 ? (
               <span className="text-[14px] font-medium text-[var(--color-ink)]/40">
                 Nobody yet — add the first player.
               </span>
             ) : (
-              players.map((player, i) => (
-                <motion.div
-                  key={player.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex items-center gap-2 rounded-full bg-white py-1.5 pl-1.5 pr-1.5 text-[15px] font-semibold text-[var(--color-ink)]"
-                >
-                  <span
-                    className="flex h-7 w-7 items-center justify-center rounded-full text-[13px] font-bold text-white"
-                    style={{ background: AVATAR_COLORS[i % AVATAR_COLORS.length] }}
+              players.map((player, i) => {
+                const color = AVATAR_COLORS[i % AVATAR_COLORS.length]
+                return (
+                  <motion.div
+                    key={player.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-1.5 text-[15px] font-bold text-[var(--color-ink)]"
+                    style={{ background: `${color}24` }}
                   >
-                    {player.name.charAt(0).toUpperCase()}
-                  </span>
-                  <span className="pl-0.5">{player.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => removePlayer(player.id)}
-                    aria-label={`Remove ${player.name}`}
-                    className="flex h-6 w-6 items-center justify-center rounded-full text-[15px] text-[var(--color-ink)]/35 transition hover:text-[var(--color-ink)]/70"
-                  >
-                    ×
-                  </button>
-                </motion.div>
-              ))
+                    <span
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-[13px] font-bold text-white"
+                      style={{ background: color }}
+                    >
+                      {player.name.charAt(0).toUpperCase()}
+                    </span>
+                    <span className="pl-0.5">{player.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => removePlayer(player.id)}
+                      aria-label={`Remove ${player.name}`}
+                      className="flex h-6 w-6 items-center justify-center rounded-full text-[16px] text-[var(--color-ink)]/40 transition hover:text-[var(--color-ink)]/75"
+                    >
+                      ×
+                    </button>
+                  </motion.div>
+                )
+              })
             )}
           </div>
 
@@ -237,14 +244,19 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
                 </div>
               </>
             ) : (
-              <div className="mt-2.5 flex items-start gap-3 rounded-2xl bg-white px-4 py-3.5">
+              <div
+                className="mt-2.5 flex items-center gap-3.5 rounded-2xl px-4 py-3.5"
+                style={{ background: `${depthTheme.accent}1A` }}
+              >
                 <span
-                  className="mt-[3px] h-3.5 w-3.5 shrink-0 rounded-full"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[15px] font-extrabold text-white"
                   style={{ background: depthTheme.accent }}
-                />
+                >
+                  {startDepth}
+                </span>
                 <div>
                   <div className="text-[16px] font-bold text-[var(--color-ink)]">
-                    Level {startDepth} · {depthTheme.label}
+                    {depthTheme.label}
                   </div>
                   <div className="mt-0.5 text-[14px] font-medium text-[var(--color-ink)]/55">
                     {depthTheme.blurb}
@@ -257,9 +269,9 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
 
         {/* Sticky CTA — always reachable, content scrolls under it. */}
         <div
-          className="sticky bottom-0 px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+          className="sticky bottom-0 px-6 pt-8 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
           style={{
-            background: `linear-gradient(to bottom, rgba(236,234,241,0), ${SETUP_BG} 42%)`,
+            background: `linear-gradient(to bottom, ${SETUP_BG}00, ${SETUP_BG} 44%)`,
           }}
         >
           <motion.button

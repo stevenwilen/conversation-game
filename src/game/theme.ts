@@ -57,9 +57,11 @@ export function depthBackground(depth: Depth): string {
 // Flat color for each screen. App paints the current one on the root <html> so
 // the browser canvas (including the iOS safe-area strip) matches the screen.
 export const START_BG = '#EE6E82'
-// Soft lavender-gray: ties to the ink tone, reads cleanly under dark text, and
-// makes the saturated topic tiles (warm + cool) pop against a calm neutral.
-export const SETUP_BG = '#ECEAF1'
+// Warm peach-sand: carries the warmth of the start screen instead of dropping to
+// a cold gray "settings page". White surfaces and cream deck cards pop against
+// it, and it harmonizes with the coral/pink/green deck accents. Flat, no
+// gradient — the warmth comes from the hue, not shading.
+export const SETUP_BG = '#F4E3D3'
 export const TRANSITION_BG = '#5C4680'
 
 export function screenBackground(screen: Screen, depth: Depth): string {
