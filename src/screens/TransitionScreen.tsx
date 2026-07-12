@@ -32,8 +32,8 @@ function actionLabel(action: TurnAction | null): string {
   }
 }
 
-// A static direction icon: chevrons down for deeper, up for lighter, a check for
-// staying at the same level.
+// A static direction icon: chevrons down for deeper, up for lighter, a checkmark
+// for staying at the same level, recycle arrows for a new topic.
 function ActionIcon({ action }: { action: TurnAction | null }) {
   const svg = {
     width: 34,
@@ -71,11 +71,10 @@ function ActionIcon({ action }: { action: TurnAction | null }) {
       </svg>
     )
   }
-  // Stay at the same level: a "you're here / holding this spot" marker.
+  // Stay at the same level: a checkmark — "good, staying here".
   return (
     <svg {...svg}>
-      <circle cx="12" cy="12" r="8.5" />
-      <circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none" />
+      <path d="M5 13l4 4 10-11" />
     </svg>
   )
 }

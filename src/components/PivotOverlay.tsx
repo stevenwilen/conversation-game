@@ -57,12 +57,10 @@ export function PivotOverlay({
                 type="button"
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onPick(deck.id)}
-                className="w-full rounded-2xl bg-[var(--color-ink)]/5 px-5 py-4 text-left"
+                style={{ background: deck.color }}
+                className="w-full rounded-2xl px-5 py-5 text-center text-[19px] font-bold text-white"
               >
-                <div className="text-[18px] font-bold">{deck.name}</div>
-                <div className="mt-0.5 text-balance text-[13px] font-medium leading-snug text-[var(--color-ink)]/55">
-                  {deck.tagline}
-                </div>
+                {deck.name}
               </motion.button>
             </li>
           ))}

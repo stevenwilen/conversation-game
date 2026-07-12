@@ -21,6 +21,20 @@ interface DeckCarouselProps {
   onSelect: (id: DeckId) => void
 }
 
+// A faded, non-interactive card shown at each end of the track so a card always
+// peeks on both sides (the first/last real deck would otherwise have a bare
+// edge). Matches the peeking real cards' size and dimmed look.
+function PlaceholderCard({ width }: { width: number }) {
+  return (
+    <div aria-hidden style={{ width, flexShrink: 0 }}>
+      <div
+        className="h-[300px] w-full rounded-[26px]"
+        style={{ background: 'rgba(255,255,255,0.4)', transform: 'scale(0.92)' }}
+      />
+    </div>
+  )
+}
+
 export function DeckCarousel({ decks, selectedId, onSelect }: DeckCarouselProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
@@ -47,11 +61,16 @@ export function DeckCarousel({ decks, selectedId, onSelect }: DeckCarouselProps)
     return () => observer.disconnect()
   }, [])
 
+  // x that centers a given real-deck index. Offset by one step because a faded
+  // placeholder card is prepended to the track (so the ends look balanced).
+  const xForIndex = (i: number) => sideInset - (i + 1) * step
+
   // Slide to the selected index whenever it (or the measured width) changes.
   useLayoutEffect(() => {
     if (width === 0) return
-    const controls = animate(x, sideInset - index * step, SNAP)
+    const controls = animate(x, xForIndex(index), SNAP)
     return controls.stop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, width, step, sideInset, x])
 
   function handleDragEnd(_event: unknown, info: PanInfo) {
@@ -65,7 +84,7 @@ export function DeckCarousel({ decks, selectedId, onSelect }: DeckCarouselProps)
       onSelect(decks[next].id)
     } else {
       // No change — spring back to center.
-      animate(x, sideInset - index * step, SNAP)
+      animate(x, xForIndex(index), SNAP)
     }
   }
 
@@ -81,12 +100,14 @@ export function DeckCarousel({ decks, selectedId, onSelect }: DeckCarouselProps)
           style={{ x, gap: GAP }}
           drag="x"
           dragConstraints={{
-            left: sideInset - (decks.length - 1) * step,
-            right: sideInset,
+            left: xForIndex(decks.length - 1),
+            right: xForIndex(0),
           }}
           dragElastic={0.12}
           onDragEnd={handleDragEnd}
         >
+          {/* Leading placeholder — never selectable, just balances the edge. */}
+          <PlaceholderCard width={cardWidth} />
           {decks.map((deck, i) => (
             <div key={deck.id} style={{ width: cardWidth, flexShrink: 0 }}>
               <DeckCard
@@ -96,6 +117,8 @@ export function DeckCarousel({ decks, selectedId, onSelect }: DeckCarouselProps)
               />
             </div>
           ))}
+          {/* Trailing placeholder. */}
+          <PlaceholderCard width={cardWidth} />
         </motion.div>
       </div>
 
