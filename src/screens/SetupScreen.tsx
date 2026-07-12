@@ -4,11 +4,29 @@ import type { Depth, DeckId, Player } from '../game/types'
 import { DEPTHS } from '../game/types'
 import { DEPTH_THEME, SETUP_BG } from '../game/theme'
 import { DECKS } from '../game/cards'
-import { DeckIcon } from '../components/DeckIcon'
+import { DeckCarousel } from '../components/DeckCarousel'
 
-// Setup is allowed to have inputs — it's not gameplay. Kept light and chip-based
-// rather than form-like. The group picks one deck to play; in-game Pivot stays
-// disabled for now, so the deck is chosen here and holds for the whole game.
+// New-game setup, rebuilt as a single screen that reads "who → what → how deep
+// → go". Players come first (the real decision), the deck is a swipeable card
+// carousel that previews the game, and the starting level shows ONLY the
+// recommended Level 1 by default — the full picker is tucked behind a quiet
+// "Change" so the group isn't nudged to jump ahead. Not gameplay, so inputs are
+// allowed, but it's kept chip- and card-based rather than form-like.
+
+const MAX_PLAYERS = 8
+
+// Warm, playful avatar colors, assigned by add-order. Purely decorative — the
+// player-facing system stays Deck + Depth + Spotlight.
+const AVATAR_COLORS = [
+  '#EE7A5F',
+  '#47A98C',
+  '#7C5BC9',
+  '#E85C63',
+  '#F2A65E',
+  '#5AA9E6',
+  '#E8739E',
+  '#3F9E7C',
+]
 
 interface SetupScreenProps {
   onBack: () => void
@@ -22,17 +40,21 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
   const [showLevels, setShowLevels] = useState(false)
   const [deckId, setDeckId] = useState<DeckId>('social')
   const idRef = useRef(0)
+  const inputRef = useRef<HTMLInputElement>(null)
 
+  const atCapacity = players.length >= MAX_PLAYERS
   const canStart = players.length >= 2
 
   function addPlayer() {
     const trimmed = name.trim()
-    if (!trimmed) return
+    if (!trimmed || atCapacity) return
     setPlayers((current) => [
       ...current,
       { id: String(idRef.current++), name: trimmed },
     ])
     setName('')
+    // Keep the keyboard up so names can be added back-to-back.
+    inputRef.current?.focus()
   }
 
   function removePlayer(id: string) {
@@ -66,13 +88,19 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
           <span className="w-14" />
         </div>
 
-        {/* Body — flows in the single page scroll (nothing pinned) */}
-        <div className="px-6 pb-4">
-          <h1 className="mt-4 text-[34px] font-bold leading-tight tracking-[-0.01em]">
-            Who's playing?
-          </h1>
+        {/* Scrolling body */}
+        <div className="flex-1 px-6 pb-4">
+          {/* ---- Who's playing ------------------------------------------- */}
+          <div className="mt-4 flex items-end justify-between gap-3">
+            <h1 className="text-[34px] font-bold leading-tight tracking-[-0.01em]">
+              Who's playing?
+            </h1>
+            <span className="pb-1.5 text-[14px] font-semibold text-[var(--color-ink)]/45">
+              {players.length} of {MAX_PLAYERS}
+            </span>
+          </div>
           <p className="mt-1.5 text-balance text-[15px] font-medium text-[var(--color-ink)]/55">
-            Everyone sharing the phone. Add at least two.
+            Pass the phone around and add everyone. Two or more.
           </p>
 
           {/* Add player */}
@@ -84,17 +112,19 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
             }}
           >
             <input
+              ref={inputRef}
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="Add a name"
+              placeholder={atCapacity ? 'Full house' : 'Add a name'}
               maxLength={20}
               autoComplete="off"
-              className="w-full rounded-2xl bg-white px-4 py-3.5 text-[17px] font-medium text-[var(--color-ink)] outline-none transition placeholder:text-[var(--color-ink)]/40"
+              disabled={atCapacity}
+              className="w-full rounded-2xl bg-white px-4 py-3.5 text-[17px] font-medium text-[var(--color-ink)] outline-none transition placeholder:text-[var(--color-ink)]/40 disabled:opacity-50"
             />
             <motion.button
               type="submit"
               whileTap={{ scale: 0.92 }}
-              disabled={!name.trim()}
+              disabled={!name.trim() || atCapacity}
               className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl bg-[var(--color-ink)] text-2xl font-light text-white disabled:opacity-30"
               aria-label="Add player"
             >
@@ -106,81 +136,69 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
           <div className="mt-4 flex flex-wrap gap-2">
             {players.length === 0 ? (
               <span className="text-[14px] font-medium text-[var(--color-ink)]/40">
-                No one yet.
+                Nobody yet — add the first player.
               </span>
             ) : (
-              players.map((player) => (
-                <motion.button
+              players.map((player, i) => (
+                <motion.div
                   key={player.id}
-                  type="button"
-                  onClick={() => removePlayer(player.id)}
                   layout
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="flex items-center gap-2 rounded-full bg-white py-2 pl-4 pr-3 text-[15px] font-semibold text-[var(--color-ink)]"
+                  className="flex items-center gap-2 rounded-full bg-white py-1.5 pl-1.5 pr-1.5 text-[15px] font-semibold text-[var(--color-ink)]"
                 >
-                  {player.name}
-                  <span className="text-[var(--color-ink)]/40">×</span>
-                </motion.button>
+                  <span
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-[13px] font-bold text-white"
+                    style={{ background: AVATAR_COLORS[i % AVATAR_COLORS.length] }}
+                  >
+                    {player.name.charAt(0).toUpperCase()}
+                  </span>
+                  <span className="pl-0.5">{player.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => removePlayer(player.id)}
+                    aria-label={`Remove ${player.name}`}
+                    className="flex h-6 w-6 items-center justify-center rounded-full text-[15px] text-[var(--color-ink)]/35 transition hover:text-[var(--color-ink)]/70"
+                  >
+                    ×
+                  </button>
+                </motion.div>
               ))
             )}
           </div>
 
-          {/* Topic tiles — each deck is a colored, card-shaped tile with its own
-              icon, so they read as distinct topics at a glance. */}
-          <div className="mt-8">
+          {/* ---- Topic (swipeable deck carousel) ------------------------- */}
+          <div className="mt-9">
             <div className="text-[13px] font-semibold uppercase tracking-[0.16em] text-[var(--color-ink)]/45">
               Topic
             </div>
-            <div className="mt-2.5 grid grid-cols-2 gap-3">
-              {DECKS.map((deck) => {
-                const selected = deck.id === deckId
-                return (
-                  <motion.button
-                    key={deck.id}
-                    type="button"
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => setDeckId(deck.id)}
-                    style={{ background: deck.color }}
-                    className={`relative flex aspect-[4/5] flex-col items-center justify-center gap-3 rounded-3xl p-3 text-white transition ${
-                      selected
-                        ? 'opacity-100 ring-[3px] ring-[var(--color-ink)]'
-                        : 'opacity-55'
-                    }`}
-                  >
-                    <DeckIcon id={deck.id} />
-                    <span className="text-balance text-center text-[15px] font-bold leading-tight">
-                      {deck.name}
-                    </span>
-                    {selected && (
-                      <span className="absolute right-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-ink)] text-white">
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden
-                        >
-                          <path d="M5 13l4 4 10-11" />
-                        </svg>
-                      </span>
-                    )}
-                  </motion.button>
-                )
-              })}
+            <div className="mt-3">
+              <DeckCarousel
+                decks={DECKS}
+                selectedId={deckId}
+                onSelect={setDeckId}
+              />
             </div>
           </div>
 
-          {/* Starting level — defaults to Level 1 and reads as a done decision.
-              The full picker is tucked behind "Change" so new players just start
-              at the beginning, while people who know the game can pick a level. */}
-          <div className="mt-7">
-            <div className="text-[13px] font-semibold uppercase tracking-[0.16em] text-[var(--color-ink)]/45">
-              Starting level
+          {/* ---- Starting level ------------------------------------------
+              Shows ONLY the recommended level by default. The full picker is
+              deliberately tucked behind a quiet "Change" so the group isn't
+              nudged to skip ahead of Level 1. */}
+          <div className="mt-9">
+            <div className="flex items-center justify-between">
+              <div className="text-[13px] font-semibold uppercase tracking-[0.16em] text-[var(--color-ink)]/45">
+                Starting level
+              </div>
+              {!showLevels && (
+                <button
+                  type="button"
+                  onClick={() => setShowLevels(true)}
+                  className="text-[13px] font-semibold text-[var(--color-ink)]/45"
+                >
+                  Change ›
+                </button>
+              )}
             </div>
 
             {showLevels ? (
@@ -193,12 +211,18 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
                         key={level}
                         type="button"
                         whileTap={{ scale: 0.9 }}
-                        onClick={() => setStartDepth(level)}
+                        onClick={() => {
+                          setStartDepth(level)
+                          setShowLevels(false)
+                        }}
                         className={`flex h-12 flex-1 items-center justify-center rounded-2xl text-[17px] font-bold transition ${
                           selected
-                            ? 'bg-[var(--color-ink)] text-white'
-                            : 'bg-white text-[var(--color-ink)]/60'
+                            ? 'text-white'
+                            : 'bg-white text-[var(--color-ink)]/55'
                         }`}
+                        style={
+                          selected ? { background: DEPTH_THEME[level].accent } : undefined
+                        }
                       >
                         {level}
                       </motion.button>
@@ -213,31 +237,37 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
                 </div>
               </>
             ) : (
-              <div className="mt-2.5 flex items-center justify-between gap-3">
-                <div className="text-balance text-[14px] font-medium text-[var(--color-ink)]/55">
-                  <span className="font-bold text-[var(--color-ink)]/75">
-                    Level {startDepth} · {depthTheme.label}.
-                  </span>{' '}
-                  {depthTheme.blurb}
+              <div className="mt-2.5 flex items-start gap-3 rounded-2xl bg-white px-4 py-3.5">
+                <span
+                  className="mt-[3px] h-3.5 w-3.5 shrink-0 rounded-full"
+                  style={{ background: depthTheme.accent }}
+                />
+                <div>
+                  <div className="text-[16px] font-bold text-[var(--color-ink)]">
+                    Level {startDepth} · {depthTheme.label}
+                  </div>
+                  <div className="mt-0.5 text-[14px] font-medium text-[var(--color-ink)]/55">
+                    {depthTheme.blurb}
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowLevels(true)}
-                  className="shrink-0 rounded-full bg-white px-4 py-2 text-[13px] font-semibold text-[var(--color-ink)]/60"
-                >
-                  Change
-                </button>
               </div>
             )}
           </div>
+        </div>
 
-          {/* CTA — flows with the content, sits at the bottom without pinning */}
+        {/* Sticky CTA — always reachable, content scrolls under it. */}
+        <div
+          className="sticky bottom-0 px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+          style={{
+            background: `linear-gradient(to bottom, rgba(236,234,241,0), ${SETUP_BG} 42%)`,
+          }}
+        >
           <motion.button
             type="button"
             onClick={() => onStart(players, startDepth, deckId)}
             disabled={!canStart}
             whileTap={{ scale: canStart ? 0.96 : 1 }}
-            className="mt-8 mb-10 w-full rounded-full bg-[var(--color-ink)] py-5 text-lg font-semibold text-white shadow-[0_6px_16px_rgba(20,16,26,0.28)] transition disabled:opacity-30"
+            className="w-full rounded-full bg-[var(--color-ink)] py-5 text-lg font-semibold text-white shadow-[0_6px_16px_rgba(20,16,26,0.28)] transition disabled:opacity-30"
           >
             {canStart ? 'Start game' : 'Add 2+ players'}
           </motion.button>
