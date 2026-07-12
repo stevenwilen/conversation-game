@@ -1,5 +1,6 @@
 import type { Deck } from '../game/types'
 import { DeckIcon } from './DeckIcon'
+import { DeckBackdropIcon } from './DeckBackdropIcon'
 
 // A deck rendered as an actual topic card, not a feature tile: the deck's color
 // IS the card surface, wrapped in an inset frame with playing-card corner
@@ -24,30 +25,20 @@ export function DeckCard({ deck, active, onClick }: DeckCardProps) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className="relative flex h-[356px] w-full flex-col items-center justify-center overflow-hidden rounded-[26px] px-7 text-center text-white transition-[transform,opacity,box-shadow] duration-300 ease-[var(--ease-soft)]"
+      className="relative flex h-[356px] w-full flex-col items-center justify-center overflow-hidden rounded-[26px] px-7 text-center text-white transition-[transform,opacity] duration-300 ease-[var(--ease-soft)]"
       style={{
         background: deck.color,
         opacity: active ? 1 : 0.5,
         transform: active ? 'scale(1)' : 'scale(0.92)',
-        boxShadow: active
-          ? '0 16px 34px rgba(60,30,10,0.30)'
-          : '0 6px 16px rgba(60,30,10,0.16)',
       }}
     >
       {/* Inset card frame */}
       <div className="pointer-events-none absolute inset-[10px] rounded-[18px] border border-white/25" />
 
-      {/* Large faded emblem for texture — flat, no glow */}
+      {/* Large faded backdrop motif for texture — a distinct icon from the
+          foreground emblem, flat, no glow. */}
       <div className="pointer-events-none absolute -bottom-10 -right-8 text-white/10">
-        <DeckIcon id={deck.id} size={210} />
-      </div>
-
-      {/* Playing-card corner indices */}
-      <div className="pointer-events-none absolute left-5 top-5 text-white/75">
-        <DeckIcon id={deck.id} size={22} />
-      </div>
-      <div className="pointer-events-none absolute bottom-5 right-5 rotate-180 text-white/75">
-        <DeckIcon id={deck.id} size={22} />
+        <DeckBackdropIcon id={deck.id} size={210} />
       </div>
 
       {/* Center emblem + title (nudged up to sit optically above the footer) */}
