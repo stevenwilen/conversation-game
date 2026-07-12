@@ -1,21 +1,22 @@
 import { useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, Reorder, useDragControls } from 'framer-motion'
 import type { Depth, DeckId, Player } from '../game/types'
 import { DEPTH_THEME, SETUP_BG } from '../game/theme'
 import { DECKS } from '../game/cards'
 import { DeckCarousel } from '../components/DeckCarousel'
 
 // New-game setup, rebuilt as a single screen that reads "who → what → how deep
-// → go". Players come first (the real decision), the deck is a swipeable card
-// carousel that previews the game, and the starting level shows ONLY the
-// recommended Level 1 by default — the full picker is tucked behind a quiet
-// "Change" so the group isn't nudged to jump ahead. Not gameplay, so inputs are
-// allowed, but it's kept chip- and card-based rather than form-like.
+// → go". Players come first (the real decision) as a drag-to-reorder turn-order
+// list that defaults to a random shuffle at start; the deck is a swipeable card
+// carousel that previews the game; and the starting level shows only the
+// recommended Level 1. Not gameplay, so inputs are allowed, but it's kept
+// card-based rather than form-like.
 
 const MAX_PLAYERS = 12
 
-// Warm, playful avatar colors, assigned by add-order. Purely decorative — the
-// player-facing system stays Deck + Depth + Spotlight.
+// Warm, playful avatar colors. Assigned by the player's stable id so a player's
+// color never changes when the turn order is shuffled or dragged. Purely
+// decorative — the player-facing system stays Deck + Depth + Spotlight.
 const AVATAR_COLORS = [
   '#EE7A5F',
   '#47A98C',
@@ -27,6 +28,73 @@ const AVATAR_COLORS = [
   '#3F9E7C',
 ]
 
+function avatarColor(player: Player): string {
+  return AVATAR_COLORS[Number(player.id) % AVATAR_COLORS.length]
+}
+
+/** Fisher–Yates, returning a new array (turn order defaults to random). */
+function shuffle<T>(items: T[]): T[] {
+  const next = [...items]
+  for (let i = next.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[next[i], next[j]] = [next[j], next[i]]
+  }
+  return next
+}
+
+// One draggable row in the turn-order list. Its own drag controls let ONLY the
+// handle start a drag, so the remove button and page scroll aren't hijacked.
+function PlayerRow({
+  player,
+  position,
+  onRemove,
+}: {
+  player: Player
+  position: number
+  onRemove: (id: string) => void
+}) {
+  const controls = useDragControls()
+  const color = avatarColor(player)
+  return (
+    <Reorder.Item
+      value={player}
+      dragListener={false}
+      dragControls={controls}
+      whileDrag={{ scale: 1.03 }}
+      className="flex items-center gap-2.5 rounded-2xl bg-white px-3 py-2.5 shadow-[0_2px_10px_rgba(120,72,40,0.08)]"
+    >
+      <span className="w-4 shrink-0 text-center text-[13px] font-bold text-[var(--color-ink)]/35">
+        {position}
+      </span>
+      <span
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white"
+        style={{ background: color }}
+      >
+        {player.name.charAt(0).toUpperCase()}
+      </span>
+      <span className="flex-1 truncate text-[16px] font-semibold text-[var(--color-ink)]">
+        {player.name}
+      </span>
+      <button
+        type="button"
+        onClick={() => onRemove(player.id)}
+        aria-label={`Remove ${player.name}`}
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[17px] text-[var(--color-ink)]/40 transition hover:text-[var(--color-ink)]/75"
+      >
+        ×
+      </button>
+      <span
+        onPointerDown={(event) => controls.start(event)}
+        className="flex h-8 w-6 shrink-0 cursor-grab touch-none items-center justify-center text-[18px] leading-none text-[var(--color-ink)]/30"
+        aria-label="Drag to reorder"
+        role="button"
+      >
+        ⠿
+      </span>
+    </Reorder.Item>
+  )
+}
+
 interface SetupScreenProps {
   onBack: () => void
   onStart: (players: Player[], startDepth: Depth, deck: DeckId) => void
@@ -37,6 +105,9 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
   const [name, setName] = useState('')
   const [startDepth, setStartDepth] = useState<Depth>(1)
   const [deckId, setDeckId] = useState<DeckId>('social')
+  // Whether the group has set the turn order themselves (dragged or shuffled).
+  // Until they do, the order is randomized when the game starts.
+  const [orderChosen, setOrderChosen] = useState(false)
   const idRef = useRef(0)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -57,6 +128,16 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
 
   function removePlayer(id: string) {
     setPlayers((current) => current.filter((player) => player.id !== id))
+  }
+
+  function shufflePlayers() {
+    setPlayers((current) => shuffle(current))
+    setOrderChosen(true)
+  }
+
+  function handleStart() {
+    // Default to a random order; honor a hand-picked one.
+    onStart(orderChosen ? players : shuffle(players), startDepth, deckId)
   }
 
   const depthTheme = DEPTH_THEME[startDepth]
@@ -127,45 +208,70 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
             </motion.button>
           </form>
 
-          {/* Player chips — each tinted with its avatar color so the roster
-              feels lively and personal, not like form tokens. */}
-          <div className="mt-4 flex flex-wrap gap-2">
-            {players.length === 0 ? (
-              <span className="text-[14px] font-medium text-[var(--color-ink)]/40">
-                Nobody yet. Add the first player.
-              </span>
-            ) : (
-              players.map((player, i) => {
-                const color = AVATAR_COLORS[i % AVATAR_COLORS.length]
-                return (
-                  <motion.div
-                    key={player.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-1.5 text-[15px] font-bold text-[var(--color-ink)]"
-                    style={{ background: `${color}24` }}
+          {/* Turn order — the roster IS the play order. Drag ⠿ to arrange or
+              Shuffle to randomize; if untouched, it's shuffled at start. */}
+          {players.length === 0 ? (
+            <p className="mt-4 text-[14px] font-medium text-[var(--color-ink)]/40">
+              Nobody yet. Add the first player.
+            </p>
+          ) : (
+            <div className="mt-5">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-semibold uppercase tracking-[0.16em] text-[var(--color-ink)]/45">
+                  Turn order
+                </span>
+                <button
+                  type="button"
+                  onClick={shufflePlayers}
+                  className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[13px] font-semibold text-[var(--color-ink)]/60 shadow-[0_1px_4px_rgba(120,72,40,0.08)]"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
                   >
-                    <span
-                      className="flex h-7 w-7 items-center justify-center rounded-full text-[13px] font-bold text-white"
-                      style={{ background: color }}
-                    >
-                      {player.name.charAt(0).toUpperCase()}
-                    </span>
-                    <span className="pl-0.5">{player.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => removePlayer(player.id)}
-                      aria-label={`Remove ${player.name}`}
-                      className="flex h-6 w-6 items-center justify-center rounded-full text-[16px] text-[var(--color-ink)]/40 transition hover:text-[var(--color-ink)]/75"
-                    >
-                      ×
-                    </button>
-                  </motion.div>
-                )
-              })
-            )}
-          </div>
+                    <path d="M16 3h5v5" />
+                    <path d="M4 20 21 3" />
+                    <path d="M21 16v5h-5" />
+                    <path d="m15 15 6 6" />
+                    <path d="M4 4l5 5" />
+                  </svg>
+                  Shuffle
+                </button>
+              </div>
+
+              <Reorder.Group
+                axis="y"
+                values={players}
+                onReorder={(next) => {
+                  setPlayers(next)
+                  setOrderChosen(true)
+                }}
+                className="mt-2.5 flex flex-col gap-2"
+              >
+                {players.map((player, i) => (
+                  <PlayerRow
+                    key={player.id}
+                    player={player}
+                    position={i + 1}
+                    onRemove={removePlayer}
+                  />
+                ))}
+              </Reorder.Group>
+
+              {!orderChosen && players.length >= 2 && (
+                <p className="mt-2.5 text-[13px] font-medium text-[var(--color-ink)]/45">
+                  Order is random at start — drag ⠿ or shuffle to set it.
+                </p>
+              )}
+            </div>
+          )}
 
           {/* ---- Topic (swipeable deck carousel) ------------------------- */}
           <div className="mt-9">
@@ -215,7 +321,7 @@ export function SetupScreen({ onBack, onStart }: SetupScreenProps) {
         >
           <motion.button
             type="button"
-            onClick={() => onStart(players, startDepth, deckId)}
+            onClick={handleStart}
             disabled={!canStart}
             whileTap={{ scale: canStart ? 0.96 : 1 }}
             className="w-full rounded-full bg-[var(--color-ink)] py-5 text-lg font-semibold text-white shadow-[0_6px_16px_rgba(20,16,26,0.28)] transition disabled:opacity-30"
